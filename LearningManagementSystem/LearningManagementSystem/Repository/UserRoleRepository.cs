@@ -19,14 +19,14 @@ namespace LearningManagementSystem.Repository
         public async Task<APIResponse> CreateNew(UserRoleModel model)
         {
             // Kiểm tra xem tên vai trò đã tồn tại hay chưa
-            if (await _context.UserRoles.AnyAsync(u => u.RoleName == model.RoleName))
-            {
-                return new APIResponse
-                {
-                    Success = false,
-                    Message = "Role name exists"
-                };
-            }
+            //if (await _context.UserRoles.AnyAsync(u => u.RoleName == model.RoleName))
+            //{
+            //    return new APIResponse
+            //    {
+            //        Success = false,
+            //        Message = "Role name exists"
+            //    };
+            //}
             var newRole = _mapper.Map<UserRole>(model);
             newRole.RoleId = Guid.NewGuid();
             await _context.AddAsync(newRole);

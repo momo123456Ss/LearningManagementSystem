@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 namespace LearningManagementSystem.Entity
 {
     [Table("UserRole")]
-    [Index(nameof(UserRole.RoleName), IsUnique = true)]
     public class UserRole
     {
         public UserRole()

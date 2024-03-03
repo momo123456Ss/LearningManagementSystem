@@ -1,4 +1,4 @@
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using LearningManagementSystem.Entity;
 using LearningManagementSystem.Repository;
 using LearningManagementSystem.Repository.InterfaceRepository;
@@ -81,8 +81,11 @@ builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = long.MaxValue;
 });
-
-
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdministrator", policy => policy.RequireRole("Administrator".ToLower(), "Quản trị".ToLower()));
+});
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

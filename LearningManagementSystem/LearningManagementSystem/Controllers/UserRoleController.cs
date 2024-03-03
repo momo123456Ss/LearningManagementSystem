@@ -15,7 +15,7 @@ namespace LearningManagementSystem.Controllers
             this._InterfaceUserRoleRepository = InterfaceUserRoleRepository;
         }
         [HttpPost("CreateNewRole")]
-        public async Task<IActionResult> CreateNewRole([FromForm] UserRoleModel model)
+        public async Task<IActionResult> CreateNewRole([FromBody] UserRoleModel model)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPut("UpdateUserRole/{id}")]
-        public async Task<IActionResult> UpdateUserRole(string id, [FromForm] UserRoleModel model)
+        public async Task<IActionResult> UpdateUserRole(string id, [FromBody] UserRoleModel model)
         {
             try
             {
