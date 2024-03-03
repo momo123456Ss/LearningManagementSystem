@@ -3,16 +3,19 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using LearningManagementSystem.Entity;
 using LearningManagementSystem.Models.APIRespone;
+using LearningManagementSystem.Models.PaginatedList;
 using LearningManagementSystem.Models.TokenModel;
 using LearningManagementSystem.Models.UserModel;
 using LearningManagementSystem.Models.UserRoleModels;
 using LearningManagementSystem.Repository.InterfaceRepository;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace LearningManagementSystem.Repository
 {
@@ -23,6 +26,7 @@ namespace LearningManagementSystem.Repository
         private readonly Cloudinary _cloudinary;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private static int PAGE_SIZE { get; set; } = 5;
 
         public UserRepository(LearningManagementSystemContext context, IConfiguration iConfiguration
             , Cloudinary cloudinary, IMapper mapper, IHttpContextAccessor httpContextAccessor)
@@ -102,7 +106,7 @@ namespace LearningManagementSystem.Repository
             int userCount = _context.Users.Count(u => u.UserType == userType);
 
             // Tạo mã người dùng dựa trên loại người dùng và số lượng người dùng hiện tại
-            return $"{userType}{userCount + 1:00}";
+            return $"{userType}{userCount + 1:000}";
         }
 
         private async Task<bool> DeleteImageCloudinary(string imageCloudinaryUri)
@@ -307,83 +311,6 @@ namespace LearningManagementSystem.Repository
             }
         }
 
-        public async Task<APIResponse> CreateLeadershipUser(UserModelAllType model)
-        {
-            var userPrincipal = _httpContextAccessor.HttpContext.User;
-            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (userCheck.UserRole.UserAccountEdit)
-            {
-                // Kiểm tra xem người dùng đã tồn tại chưa
-                if (await _context.Users.AnyAsync(u => u.Email == model.Email))
-                {
-                    return new APIResponse
-                    {
-                        Success = false,
-                        Message = "Email exists"
-                    };
-                }
-                string imageUrl;
-                if (model.imageFile != null)
-                {
-                    // Tải lên ảnh lên Cloudinary
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
-                        // Các tham số tải lên khác
-                    };
-                    var uploadResult = _cloudinary.Upload(uploadParams);
-
-                    // Lấy URL của ảnh từ kết quả tải lên
-                    imageUrl = uploadResult.SecureUrl.ToString();
-                    if (imageUrl == null)
-                    {
-                        return new APIResponse
-                        {
-                            Success = false,
-                            Message = "Upload image failed."
-                        };
-                    }
-                }
-                else
-                {
-                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
-                }
-                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-                var newUser = _mapper.Map<User>(model);
-                newUser.UserType = "QT";
-                newUser.UserCode = GenerateUserCode("QT");
-                newUser.Password = hashedPassword;
-                newUser.Avatar = imageUrl;
-                //Set thông báo là true khi khởi tạo Leadership (Loại thông báo Leadership)
-                //Thông báo chung
-                newUser.NotificationWhenUpdatingAccount = true;
-                newUser.NotificationWhenChangingPassword = true;
-                //Thông báo của Leadership
-                #region
-                newUser.LeadershipNotificationWhenYouMakeChangesInTheRoleList = true;
-                newUser.LeadershipNotificationWhenYouMakeChangesInTheUserList = true;
-                newUser.LeadershipNotificationWhenInstructorsSaveNewExamQuestionsIntoTheSystem = true;
-                newUser.LeadershipNotificationWhenYouConfirmOrCancelTheTest = true;
-                newUser.LeadershipNotificationWhenYouCreateOrChangeNamesOrDeletePrivateFiles = true;
-                newUser.LeadershipNotificationWhenThereAreChangesInSubjectContent = true;
-                newUser.LeadershipNotificationWhenThereAreChangesInSubjectManagement = true;
-                #endregion
-                await _context.AddAsync(newUser);
-                await _context.SaveChangesAsync();
-                return new APIResponse
-                {
-                    Success = true,
-                    Message = "Sign Up Success."
-                };
-            }
-            else
-            {
-                return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
-            }
-        }
-
         public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -406,6 +333,7 @@ namespace LearningManagementSystem.Repository
 
             return principal;
         }
+        //Edit
 
         public async Task<APIResponse> ActiveUser(string id)
         {
@@ -525,7 +453,7 @@ namespace LearningManagementSystem.Repository
                 await _context.SaveChangesAsync();
                 return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
             }
-            else if(!currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
+            else if (!currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
             {
                 // Phân tích URL để lấy public ID của hình ảnh trên Cloudinary
                 string publicId = string.Empty;
@@ -584,6 +512,302 @@ namespace LearningManagementSystem.Repository
             }
             return new APIResponse { Success = true, Message = "Something Error" };
 
+        }
+        public async Task<APIResponse> ChangePassword(UserChangePasswordModel model)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                           .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+
+            // Kiểm tra mật khẩu hiện tại
+            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.Password))
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    Message = "Invalid current password."
+                };
+            }
+            // Kiểm tra nếu mật khẩu mới giống với mật khẩu cũ
+            if (model.NewPassword.Equals(model.CurrentPassword))
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    Message = "New password must be different from the current password."
+                };
+            }
+            // Mã hóa mật khẩu mới
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            // Cập nhật mật khẩu mới cho người dùng
+            user.Password = hashedPassword;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Password changed successfully."
+            };
+        }
+
+        //Create user
+        public async Task<APIResponse> CreateLeadershipUser(UserModelAllType model)
+        {
+            var userPrincipal = _httpContextAccessor.HttpContext.User;
+            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (userCheck.UserRole.UserAccountEdit)
+            {
+                // Kiểm tra xem người dùng đã tồn tại chưa
+                if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        Message = "Email exists"
+                    };
+                }
+                string imageUrl;
+                if (model.imageFile != null)
+                {
+                    // Tải lên ảnh lên Cloudinary
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                        // Các tham số tải lên khác
+                    };
+                    var uploadResult = _cloudinary.Upload(uploadParams);
+
+                    // Lấy URL của ảnh từ kết quả tải lên
+                    imageUrl = uploadResult.SecureUrl.ToString();
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
+                }
+                else
+                {
+                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                }
+                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+                var newUser = _mapper.Map<User>(model);
+                newUser.UserType = "QT";
+                newUser.UserCode = GenerateUserCode("QT");
+                newUser.Password = hashedPassword;
+                newUser.Avatar = imageUrl;
+                //Set thông báo là true khi khởi tạo Leadership (Loại thông báo Leadership)
+                //Thông báo chung
+                newUser.NotificationWhenUpdatingAccount = true;
+                newUser.NotificationWhenChangingPassword = true;
+                //Thông báo của Leadership
+                #region
+                newUser.LeadershipNotificationWhenYouMakeChangesInTheRoleList = true;
+                newUser.LeadershipNotificationWhenYouMakeChangesInTheUserList = true;
+                newUser.LeadershipNotificationWhenInstructorsSaveNewExamQuestionsIntoTheSystem = true;
+                newUser.LeadershipNotificationWhenYouConfirmOrCancelTheTest = true;
+                newUser.LeadershipNotificationWhenYouCreateOrChangeNamesOrDeletePrivateFiles = true;
+                newUser.LeadershipNotificationWhenThereAreChangesInSubjectContent = true;
+                newUser.LeadershipNotificationWhenThereAreChangesInSubjectManagement = true;
+                #endregion
+                await _context.AddAsync(newUser);
+                await _context.SaveChangesAsync();
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Sign Up Success."
+                };
+            }
+            else
+            {
+                return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
+            }
+        }
+        public async Task<APIResponse> CreateTeacherUser(UserModelAllType model)
+        {
+            var userPrincipal = _httpContextAccessor.HttpContext.User;
+            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (userCheck.UserRole.UserAccountEdit)
+            {
+                // Kiểm tra xem người dùng đã tồn tại chưa
+                if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        Message = "Email exists"
+                    };
+                }
+                string imageUrl;
+                if (model.imageFile != null)
+                {
+                    // Tải lên ảnh lên Cloudinary
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                        // Các tham số tải lên khác
+                    };
+                    var uploadResult = _cloudinary.Upload(uploadParams);
+
+                    // Lấy URL của ảnh từ kết quả tải lên
+                    imageUrl = uploadResult.SecureUrl.ToString();
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
+                }
+                else
+                {
+                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                }
+                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+                var newUser = _mapper.Map<User>(model);
+                newUser.UserType = "GV";
+                newUser.UserCode = GenerateUserCode("GV");
+                newUser.Password = hashedPassword;
+                newUser.Avatar = imageUrl;
+                //Set thông báo là true khi khởi tạo Leadership (Loại thông báo Leadership)
+                //Thông báo chung
+                newUser.NotificationWhenUpdatingAccount = true;
+                newUser.NotificationWhenChangingPassword = true;
+                //Thông báo của Teacher
+                #region
+                newUser.TeacherNotificationWhenYouUploadOrCreateNewTestQuestionsAndRenameTestQuestions = true;
+                newUser.TeacherNotificationWhenYouUpdateTheTestBankWhenUploadOrCreateNewOrEditAndDelete = true;
+                newUser.TeacherNotificationWhenYouCreateOrChangeTheNameOrDeleteALectureAndMoveTheLectureToTheSubjectTopic = true;
+                newUser.TeacherNotifyWhenYouCreateOrChangeTheNameOrDeleteAResourcesAndMoveTheResourcesToTheSubjectTopic = true;
+                newUser.TeacherNotificationWhenYouAddDocumentsOrUpdateDocumentsAndAssignDocumentsToTeachingClasses = true;
+                newUser.TeacherNotificationWhenSomeoneAsksAQuestionInTheCourseOrInteractsWithYourAnswer = true;
+                newUser.TeacherNotificationWhenSomeoneCommentsOnTheCourseAnnouncement = true;
+                #endregion
+                await _context.AddAsync(newUser);
+                await _context.SaveChangesAsync();
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Sign Up Success."
+                };
+            }
+            else
+            {
+                return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
+            }
+        }
+
+        public async Task<APIResponse> CreateStudentUser(UserModelAllType model)
+        {
+            var userPrincipal = _httpContextAccessor.HttpContext.User;
+            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (userCheck.UserRole.UserAccountEdit)
+            {
+                // Kiểm tra xem người dùng đã tồn tại chưa
+                if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+                {
+                    return new APIResponse
+                    {
+                        Success = false,
+                        Message = "Email exists"
+                    };
+                }
+                string imageUrl;
+                if (model.imageFile != null)
+                {
+                    // Tải lên ảnh lên Cloudinary
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                        // Các tham số tải lên khác
+                    };
+                    var uploadResult = _cloudinary.Upload(uploadParams);
+
+                    // Lấy URL của ảnh từ kết quả tải lên
+                    imageUrl = uploadResult.SecureUrl.ToString();
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
+                }
+                else
+                {
+                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                }
+                // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+                var newUser = _mapper.Map<User>(model);
+                newUser.UserType = "GV";
+                newUser.UserCode = GenerateUserCode("GV");
+                newUser.Password = hashedPassword;
+                newUser.Avatar = imageUrl;
+                //Set thông báo là true khi khởi tạo Leadership (Loại thông báo Leadership)
+                //Thông báo chung
+                newUser.NotificationWhenUpdatingAccount = true;
+                newUser.NotificationWhenChangingPassword = true;
+                //Thông báo của Teacher
+                #region
+                newUser.StudentNotificationsWhenInstructorsCreateSubjectAnnouncements = true;
+                newUser.StudentNotificationsWhenSomeoneCommentsOnASubjectAnnouncement = true;
+                newUser.StudentNotificationsWhenTheLecturerAsksAQuestionInTheSubject = true;
+                newUser.StudentNotificationsWhenSomeoneInteractsWithYourQuestionOrAnswer = true;
+                #endregion
+                await _context.AddAsync(newUser);
+                await _context.SaveChangesAsync();
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Sign Up Success."
+                };
+            }
+            else
+            {
+                return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
+            }
+        }
+        //Get
+        public async Task<List<UserViewModel>> GetAll(string searchString, string roleName, int page = 1)
+        {
+            var allUser = _context.Users.Include(role => role.UserRole).AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                allUser = allUser.Where(user =>
+                    user.UserCode.ToLower().Contains(searchString) ||
+                    user.Email.ToLower().Contains(searchString) ||
+                    (user.FirstName.ToLower() + " " + user.LastName.ToLower()).Contains(searchString)
+                );
+            }
+            if (!string.IsNullOrEmpty(roleName))
+            {
+                allUser = allUser.Where(user => user.UserRole.RoleName.ToLower() == roleName.ToLower());
+            }
+            if (page < 1)
+            {
+                return _mapper.Map<List<UserViewModel>>(allUser);
+            }
+            var result = PaginatedList<User>.Create(allUser, page, PAGE_SIZE);
+            return _mapper.Map<List<UserViewModel>>(result);
+
+        }
+
+        public async Task<UserViewModel> GetUserById(string id)
+        {
+            // Tìm người dùng trong cơ sở dữ liệu bằng Id
+            var user = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.UserId.Equals(Guid.Parse(id)));
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            return userViewModel;
         }
     }
 }

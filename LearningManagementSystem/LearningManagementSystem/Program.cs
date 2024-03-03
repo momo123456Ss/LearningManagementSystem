@@ -86,6 +86,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdministrator", policy => policy.RequireRole("Administrator".ToLower(), "Quản trị".ToLower()));
 });
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

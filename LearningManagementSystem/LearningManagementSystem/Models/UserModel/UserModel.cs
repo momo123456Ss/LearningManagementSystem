@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using LearningManagementSystem.Models.UserRoleModels;
 
 namespace LearningManagementSystem.Models.UserModel
 {
+    //Model
     public class UserModelUpdateAllType
     {
         //Thông tin cá nhân
@@ -60,5 +62,30 @@ namespace LearningManagementSystem.Models.UserModel
     public class UserModelChangeAvatar
     {
         public IFormFile? imageFile { get; set; }
+    }
+    public class UserModelUpdateRole
+    {
+        public Guid? RoleId { get; set; }
+    }
+    public class UserChangePasswordModel
+    {
+        [Required]
+        [MaxLength(255)]
+        public string CurrentPassword { get; set; }
+        [Required]
+        [MaxLength(255)]
+        public string NewPassword { get; set; }
+    }
+    //ViewModel
+    public class UserViewModel
+    {
+        public string UserCode { get; set; }
+        public string FullName {  get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string Gender { get; set; }
+        public string Address { get; set; }
+        public UserRoleViewModel UserRoleViewModel { get; set; }
+
     }
 }
