@@ -145,6 +145,64 @@ namespace LearningManagementSystem.Repository
 
         }
         //Public
+        //GET
+        #region
+        public async Task<List<UserViewModel>> GetAll(string searchString, string roleName, int page = 1)
+        {
+            var allUser = _context.Users.Include(role => role.UserRole).AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                allUser = allUser.Where(user =>
+                    user.UserCode.ToLower().Contains(searchString) ||
+                    user.Email.ToLower().Contains(searchString) ||
+                    (user.FirstName.ToLower() + " " + user.LastName.ToLower()).Contains(searchString)
+                );
+            }
+            if (!string.IsNullOrEmpty(roleName))
+            {
+                allUser = allUser.Where(user => user.UserRole.RoleName.ToLower() == roleName.ToLower());
+            }
+            if (page < 1)
+            {
+                return _mapper.Map<List<UserViewModel>>(allUser);
+            }
+            var result = PaginatedList<User>.Create(allUser, page, PAGE_SIZE);
+            return _mapper.Map<List<UserViewModel>>(result);
+
+        }
+        public async Task<UserViewModel> GetUserById(string id)
+        {
+            // Tìm người dùng trong cơ sở dữ liệu bằng Id
+            var user = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.UserId.Equals(Guid.Parse(id)));
+            var userViewModel = _mapper.Map<UserViewModel>(user);
+            return userViewModel;
+        }
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var secretKeyBytes = Encoding.UTF8.GetBytes(_iConfiguration["JWT:Secret"]);
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+                ValidateIssuer = true,
+                ValidIssuer = _iConfiguration["JWT:ValidIssuer"], // Issuer của token
+                ValidateAudience = true,
+                ValidAudience = _iConfiguration["JWT:ValidAudience"], // Audience của token
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            SecurityToken validatedToken;
+            ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+
+            return principal;
+        }
+        #endregion
+        //POST
+        #region
         public async Task<APIResponse> RenewToken(TokenModel model)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -278,7 +336,6 @@ namespace LearningManagementSystem.Repository
                 Data = token
             };
         }
-
         public async Task<APIResponse> SignIn(SignInModel model)
         {
             var user = _context.Users.SingleOrDefault(u => u.Email.Equals(model.Email));
@@ -310,246 +367,6 @@ namespace LearningManagementSystem.Repository
                 };
             }
         }
-
-        public ClaimsPrincipal ValidateToken(string token)
-        {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var secretKeyBytes = Encoding.UTF8.GetBytes(_iConfiguration["JWT:Secret"]);
-
-            var validationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
-                ValidateIssuer = true,
-                ValidIssuer = _iConfiguration["JWT:ValidIssuer"], // Issuer của token
-                ValidateAudience = true,
-                ValidAudience = _iConfiguration["JWT:ValidAudience"], // Audience của token
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-
-            SecurityToken validatedToken;
-            ClaimsPrincipal principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-
-            return principal;
-        }
-        //Edit
-
-        public async Task<APIResponse> ActiveUser(string id)
-        {
-            var userPrincipal = _httpContextAccessor.HttpContext.User;
-            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (userCheck.UserRole.UserAccountEdit)
-            {
-                try
-                {
-                    var user = await _context.Users.FindAsync(Guid.Parse(id));
-                    if (!user.IsActived)
-                    {
-                        user.IsActived = true;
-                    }
-                    else
-                    {
-                        user.IsActived = false;
-                    }
-                    await _context.SaveChangesAsync();
-                    return new APIResponse { Success = true, Message = "ActiveUser - DeactiveUser successfully" };
-                }
-                catch (Exception ex)
-                {
-                    return new APIResponse { Success = false, Message = $"Error ActiveUser: {ex.Message}" };
-                }
-            }
-            else
-            {
-                return new APIResponse { Success = false, Message = "The account does not have permission to edit user information" };
-            }
-        }
-
-        public async Task<APIResponse> UpdateUserPersonalInformation(string id, UserModelUpdateAllType model)
-        {
-            var userPrincipal = _httpContextAccessor.HttpContext.User;
-            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
-            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (userCheck.UserRole.UserAccountEdit)
-            {
-                try
-                {
-                    var user = await _context.Users.FindAsync(Guid.Parse(id));
-
-                    if (user == null)
-                    {
-                        return new APIResponse { Success = false, Message = "User not found" };
-                    }
-                    //_mapper.Map(model, userRole);
-
-                    // Cập nhật từng trường một từ model vào userRole
-                    #region
-                    foreach (var property in typeof(UserModelUpdateAllType).GetProperties())
-                    {
-                        var modelValue = property.GetValue(model);
-                        if (modelValue != null)
-                        {
-                            var userProperty = typeof(User).GetProperty(property.Name);
-                            if (userProperty != null)
-                            {
-                                userProperty.SetValue(user, modelValue);
-                            }
-                        }
-                    }
-                    #endregion
-                    await _context.SaveChangesAsync();
-
-                    return new APIResponse { Success = true, Message = "User updated successfully" };
-                }
-                catch (Exception ex)
-                {
-                    return new APIResponse { Success = false, Message = $"Error updating User: {ex.Message}" };
-                }
-            }
-            else
-            {
-                return new APIResponse { Success = false, Message = "The account does not have permission to edit user information" };
-            }
-        }
-
-        public async Task<APIResponse> ChangeUserAvatar(UserModelChangeAvatar model)
-        {
-            var user = await _context.Users.Include(role => role.UserRole)
-                .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
-            // Lấy URL của hình ảnh hiện tại từ cơ sở dữ liệu hoặc từ bất kỳ nguồn nào khác
-            string currentImageUrl = user.Avatar; // Giả sử user.Avatar là URL của hình ảnh hiện tại
-
-            if (currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
-            {
-                string imageUrl;
-                if (model.imageFile != null)
-                {
-                    // Tải lên ảnh lên Cloudinary
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
-                        // Các tham số tải lên khác
-                    };
-                    var uploadResult = _cloudinary.Upload(uploadParams);
-
-                    // Lấy URL của ảnh từ kết quả tải lên
-                    imageUrl = uploadResult.SecureUrl.ToString();
-                    if (imageUrl == null)
-                    {
-                        return new APIResponse
-                        {
-                            Success = false,
-                            Message = "Upload image failed."
-                        };
-                    }
-                }
-                else
-                {
-                    return new APIResponse { Success = true, Message = "No photo found" };
-                }
-                user.Avatar = imageUrl;
-                await _context.SaveChangesAsync();
-                return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
-            }
-            else if (!currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
-            {
-                // Phân tích URL để lấy public ID của hình ảnh trên Cloudinary
-                string publicId = string.Empty;
-                if (!string.IsNullOrEmpty(currentImageUrl))
-                {
-                    Uri uri = new Uri(currentImageUrl);
-                    string path = uri.AbsolutePath;
-                    // Cloudinary public ID là phần sau cùng của đường dẫn URL, loại bỏ phần đuôi mở rộng của tệp (ví dụ: .jpg, .png)
-                    publicId = Path.GetFileNameWithoutExtension(path);
-                }
-
-                // Sử dụng Cloudinary API để xóa hình ảnh sử dụng public ID
-                if (!string.IsNullOrEmpty(publicId))
-                {
-                    var deletionParams = new DeletionParams(publicId);
-                    var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
-                    // Kiểm tra xem hình ảnh đã được xóa thành công hay không
-                    if (deletionResult.Result == "ok")
-                    {
-                        // Xóa hình ảnh thành công
-                        string imageUrl;
-                        if (model.imageFile != null)
-                        {
-                            // Tải lên ảnh lên Cloudinary
-                            var uploadParams = new ImageUploadParams()
-                            {
-                                File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
-                                // Các tham số tải lên khác
-                            };
-                            var uploadResult = _cloudinary.Upload(uploadParams);
-
-                            // Lấy URL của ảnh từ kết quả tải lên
-                            imageUrl = uploadResult.SecureUrl.ToString();
-                            if (imageUrl == null)
-                            {
-                                return new APIResponse
-                                {
-                                    Success = false,
-                                    Message = "Upload image failed."
-                                };
-                            }
-                        }
-                        else
-                        {
-                            return new APIResponse { Success = true, Message = "No photo found" };
-                        }
-                        user.Avatar = imageUrl;
-                        await _context.SaveChangesAsync();
-                        return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
-                    }
-                    else
-                    {
-                        return new APIResponse { Success = false, Message = "Deleting current avatar failed" };
-                    }
-                }
-            }
-            return new APIResponse { Success = true, Message = "Something Error" };
-
-        }
-        public async Task<APIResponse> ChangePassword(UserChangePasswordModel model)
-        {
-            var user = await _context.Users.Include(role => role.UserRole)
-                           .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
-
-            // Kiểm tra mật khẩu hiện tại
-            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.Password))
-            {
-                return new APIResponse
-                {
-                    Success = false,
-                    Message = "Invalid current password."
-                };
-            }
-            // Kiểm tra nếu mật khẩu mới giống với mật khẩu cũ
-            if (model.NewPassword.Equals(model.CurrentPassword))
-            {
-                return new APIResponse
-                {
-                    Success = false,
-                    Message = "New password must be different from the current password."
-                };
-            }
-            // Mã hóa mật khẩu mới
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
-            // Cập nhật mật khẩu mới cho người dùng
-            user.Password = hashedPassword;
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            return new APIResponse
-            {
-                Success = true,
-                Message = "Password changed successfully."
-            };
-        }
-
-        //Create user
         public async Task<APIResponse> CreateLeadershipUser(UserModelAllType model)
         {
             var userPrincipal = _httpContextAccessor.HttpContext.User;
@@ -702,7 +519,6 @@ namespace LearningManagementSystem.Repository
                 return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
             }
         }
-
         public async Task<APIResponse> CreateStudentUser(UserModelAllType model)
         {
             var userPrincipal = _httpContextAccessor.HttpContext.User;
@@ -776,38 +592,292 @@ namespace LearningManagementSystem.Repository
                 return new APIResponse { Success = false, Message = "The account does not have permission to create user" };
             }
         }
-        //Get
-        public async Task<List<UserViewModel>> GetAll(string searchString, string roleName, int page = 1)
+        #endregion
+        //PUT
+        #region
+        public async Task<APIResponse> UpdateUserPersonalInformation(string id, UserModelUpdateAllType model)
         {
-            var allUser = _context.Users.Include(role => role.UserRole).AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
+            var userPrincipal = _httpContextAccessor.HttpContext.User;
+            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (userCheck.UserRole.UserAccountEdit)
             {
-                searchString = searchString.ToLower();
-                allUser = allUser.Where(user =>
-                    user.UserCode.ToLower().Contains(searchString) ||
-                    user.Email.ToLower().Contains(searchString) ||
-                    (user.FirstName.ToLower() + " " + user.LastName.ToLower()).Contains(searchString)
-                );
-            }
-            if (!string.IsNullOrEmpty(roleName))
-            {
-                allUser = allUser.Where(user => user.UserRole.RoleName.ToLower() == roleName.ToLower());
-            }
-            if (page < 1)
-            {
-                return _mapper.Map<List<UserViewModel>>(allUser);
-            }
-            var result = PaginatedList<User>.Create(allUser, page, PAGE_SIZE);
-            return _mapper.Map<List<UserViewModel>>(result);
+                try
+                {
+                    var user = await _context.Users.FindAsync(Guid.Parse(id));
 
+                    if (user == null)
+                    {
+                        return new APIResponse { Success = false, Message = "User not found" };
+                    }
+                    //_mapper.Map(model, userRole);
+
+                    // Cập nhật từng trường một từ model vào userRole
+                    #region
+                    foreach (var property in typeof(UserModelUpdateAllType).GetProperties())
+                    {
+                        var modelValue = property.GetValue(model);
+                        if (modelValue != null)
+                        {
+                            var userProperty = typeof(User).GetProperty(property.Name);
+                            if (userProperty != null)
+                            {
+                                userProperty.SetValue(user, modelValue);
+                            }
+                        }
+                    }
+                    #endregion
+                    await _context.SaveChangesAsync();
+
+                    return new APIResponse { Success = true, Message = "User updated successfully" };
+                }
+                catch (Exception ex)
+                {
+                    return new APIResponse { Success = false, Message = $"Error updating User: {ex.Message}" };
+                }
+            }
+            else
+            {
+                return new APIResponse { Success = false, Message = "The account does not have permission to edit user information" };
+            }
+        }
+        public async Task<APIResponse> UpdateLeadershipModelUpdateNotificationSettings(LeadershipModelUpdateNotificationSettings model)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                           .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            // Cập nhật từng trường một từ model vào userRole
+            #region
+            foreach (var property in typeof(LeadershipModelUpdateNotificationSettings).GetProperties())
+            {
+                var modelValue = property.GetValue(model);
+                if (modelValue != null)
+                {
+                    var userProperty = typeof(User).GetProperty(property.Name);
+                    if (userProperty != null)
+                    {
+                        userProperty.SetValue(user, modelValue);
+                    }
+                }
+            }
+            #endregion
+            await _context.SaveChangesAsync();
+            return new APIResponse { Success = true, Message = "Leadership Update Notification Settings successfully" };
         }
 
-        public async Task<UserViewModel> GetUserById(string id)
+        public async Task<APIResponse> UpdateTeacherUpdateNotificationSettings(TeacherModelUpdateNotificationSettings model)
         {
-            // Tìm người dùng trong cơ sở dữ liệu bằng Id
-            var user = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.UserId.Equals(Guid.Parse(id)));
-            var userViewModel = _mapper.Map<UserViewModel>(user);
-            return userViewModel;
+            var user = await _context.Users.Include(role => role.UserRole)
+                           .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            // Cập nhật từng trường một từ model vào userRole
+            #region
+            foreach (var property in typeof(TeacherModelUpdateNotificationSettings).GetProperties())
+            {
+                var modelValue = property.GetValue(model);
+                if (modelValue != null)
+                {
+                    var userProperty = typeof(User).GetProperty(property.Name);
+                    if (userProperty != null)
+                    {
+                        userProperty.SetValue(user, modelValue);
+                    }
+                }
+            }
+            #endregion
+            await _context.SaveChangesAsync();
+            return new APIResponse { Success = true, Message = "Teacher Update Notification Settings successfully" };
         }
+
+        public async Task<APIResponse> UpdateStudentModelUpdateNotificationSettings(StudentModelUpdateNotificationSettings model)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+               .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            // Cập nhật từng trường một từ model vào userRole
+            #region
+            foreach (var property in typeof(StudentModelUpdateNotificationSettings).GetProperties())
+            {
+                var modelValue = property.GetValue(model);
+                if (modelValue != null)
+                {
+                    var userProperty = typeof(User).GetProperty(property.Name);
+                    if (userProperty != null)
+                    {
+                        userProperty.SetValue(user, modelValue);
+                    }
+                }
+            }
+            #endregion
+            await _context.SaveChangesAsync();
+            return new APIResponse { Success = true, Message = "Student Update Notification Settings successfully" };
+        }
+        public async Task<APIResponse> ActiveUser(string id)
+        {
+            var userPrincipal = _httpContextAccessor.HttpContext.User;
+            var userEmail = userPrincipal.FindFirstValue(ClaimTypes.Email);
+            var userCheck = await _context.Users.Include(role => role.UserRole).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (userCheck.UserRole.UserAccountEdit)
+            {
+                try
+                {
+                    var user = await _context.Users.FindAsync(Guid.Parse(id));
+                    if (!user.IsActived)
+                    {
+                        user.IsActived = true;
+                    }
+                    else
+                    {
+                        user.IsActived = false;
+                    }
+                    await _context.SaveChangesAsync();
+                    return new APIResponse { Success = true, Message = "ActiveUser - DeactiveUser successfully" };
+                }
+                catch (Exception ex)
+                {
+                    return new APIResponse { Success = false, Message = $"Error ActiveUser: {ex.Message}" };
+                }
+            }
+            else
+            {
+                return new APIResponse { Success = false, Message = "The account does not have permission to edit user information" };
+            }
+        }
+        public async Task<APIResponse> ChangeUserAvatar(UserModelChangeAvatar model)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            // Lấy URL của hình ảnh hiện tại từ cơ sở dữ liệu hoặc từ bất kỳ nguồn nào khác
+            string currentImageUrl = user.Avatar; // Giả sử user.Avatar là URL của hình ảnh hiện tại
+
+            if (currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
+            {
+                string imageUrl;
+                if (model.imageFile != null)
+                {
+                    // Tải lên ảnh lên Cloudinary
+                    var uploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                        // Các tham số tải lên khác
+                    };
+                    var uploadResult = _cloudinary.Upload(uploadParams);
+
+                    // Lấy URL của ảnh từ kết quả tải lên
+                    imageUrl = uploadResult.SecureUrl.ToString();
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
+                }
+                else
+                {
+                    return new APIResponse { Success = true, Message = "No photo found" };
+                }
+                user.Avatar = imageUrl;
+                await _context.SaveChangesAsync();
+                return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
+            }
+            else if (!currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
+            {
+                // Phân tích URL để lấy public ID của hình ảnh trên Cloudinary
+                string publicId = string.Empty;
+                if (!string.IsNullOrEmpty(currentImageUrl))
+                {
+                    Uri uri = new Uri(currentImageUrl);
+                    string path = uri.AbsolutePath;
+                    // Cloudinary public ID là phần sau cùng của đường dẫn URL, loại bỏ phần đuôi mở rộng của tệp (ví dụ: .jpg, .png)
+                    publicId = Path.GetFileNameWithoutExtension(path);
+                }
+
+                // Sử dụng Cloudinary API để xóa hình ảnh sử dụng public ID
+                if (!string.IsNullOrEmpty(publicId))
+                {
+                    var deletionParams = new DeletionParams(publicId);
+                    var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
+                    // Kiểm tra xem hình ảnh đã được xóa thành công hay không
+                    if (deletionResult.Result == "ok")
+                    {
+                        // Xóa hình ảnh thành công
+                        string imageUrl;
+                        if (model.imageFile != null)
+                        {
+                            // Tải lên ảnh lên Cloudinary
+                            var uploadParams = new ImageUploadParams()
+                            {
+                                File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                                // Các tham số tải lên khác
+                            };
+                            var uploadResult = _cloudinary.Upload(uploadParams);
+
+                            // Lấy URL của ảnh từ kết quả tải lên
+                            imageUrl = uploadResult.SecureUrl.ToString();
+                            if (imageUrl == null)
+                            {
+                                return new APIResponse
+                                {
+                                    Success = false,
+                                    Message = "Upload image failed."
+                                };
+                            }
+                        }
+                        else
+                        {
+                            return new APIResponse { Success = true, Message = "No photo found" };
+                        }
+                        user.Avatar = imageUrl;
+                        await _context.SaveChangesAsync();
+                        return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
+                    }
+                    else
+                    {
+                        return new APIResponse { Success = false, Message = "Deleting current avatar failed" };
+                    }
+                }
+            }
+            return new APIResponse { Success = true, Message = "Something Error" };
+
+        }
+        public async Task<APIResponse> ChangePassword(UserChangePasswordModel model)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                           .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+
+            // Kiểm tra mật khẩu hiện tại
+            if (!BCrypt.Net.BCrypt.Verify(model.CurrentPassword, user.Password))
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    Message = "Invalid current password."
+                };
+            }
+            // Kiểm tra nếu mật khẩu mới giống với mật khẩu cũ
+            if (model.NewPassword.Equals(model.CurrentPassword))
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    Message = "New password must be different from the current password."
+                };
+            }
+            // Mã hóa mật khẩu mới
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+            // Cập nhật mật khẩu mới cho người dùng
+            user.Password = hashedPassword;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Password changed successfully."
+            };
+        }
+        #endregion
+
+
+
+
     }
 }

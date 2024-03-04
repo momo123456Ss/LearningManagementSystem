@@ -28,6 +28,7 @@ namespace LearningManagementSystem.Controllers
         }
 
         //GET
+        #region
         [HttpGet("DownloadFileFromCloudinary")]
         [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> DownloadFile(string cloudinaryUrl)
@@ -89,8 +90,8 @@ namespace LearningManagementSystem.Controllers
         {
             try
             {
-                return Ok(await _interfaceUserRepository.GetAll(userCodeOrEmailOrFullname, roleName,page));
-            }catch (Exception ex)
+                return Ok(await _interfaceUserRepository.GetAll(userCodeOrEmailOrFullname, roleName, page));
+            } catch (Exception ex)
             {
                 return BadRequest(
                    new APIResponse
@@ -110,10 +111,12 @@ namespace LearningManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return NotFound();
             }
         }
+        #endregion
         //POST
+        #region
         [HttpPost("RenewToken")]
         public async Task<IActionResult> RenewToken(TokenModel model)
         {
@@ -121,7 +124,7 @@ namespace LearningManagementSystem.Controllers
             {
                 return Ok(await _interfaceUserRepository.RenewToken(model));
             }
-            catch(Exception ex){
+            catch (Exception ex) {
                 return BadRequest(new APIResponse
                 {
                     Success = false,
@@ -135,7 +138,7 @@ namespace LearningManagementSystem.Controllers
             try
             {
                 return Ok(await _interfaceUserRepository.SignIn(model));
-            }catch (Exception ex)
+            } catch (Exception ex)
             {
                 return BadRequest(
                     new APIResponse
@@ -152,12 +155,12 @@ namespace LearningManagementSystem.Controllers
             try
             {
                 return Ok(await _interfaceUserRepository.CreateLeadershipUser(model));
-            }catch (Exception ex)
+            } catch (Exception ex)
             {
                 return BadRequest(
-                    new APIResponse { 
-                        Success = false, 
-                        Message = $"Error CreateLeadershipUser: {ex.Message}" 
+                    new APIResponse {
+                        Success = false,
+                        Message = $"Error CreateLeadershipUser: {ex.Message}"
                     });
             }
         }
@@ -197,7 +200,9 @@ namespace LearningManagementSystem.Controllers
                     });
             }
         }
+        #endregion
         //PUT
+        #region
         [HttpPut("UpdateUserPersonalInformation/{id}")]
         [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> UpdateUserPersonalInformation(string id, [FromBody] UserModelUpdateAllType model)
@@ -213,6 +218,60 @@ namespace LearningManagementSystem.Controllers
                     {
                         Success = false,
                         Message = $"Error UpdateUserPersonalInformation: {ex.Message}"
+                    });
+            }
+        }
+        [HttpPut("UpdateLeadershipModelUpdateNotificationSettings")]
+        [Authorize(Policy = "RequireAdministrator")]
+        public async Task<IActionResult> UpdateLeadershipModelUpdateNotificationSettings([FromBody] LeadershipModelUpdateNotificationSettings model)
+        {
+            try
+            {
+                return Ok(await _interfaceUserRepository.UpdateLeadershipModelUpdateNotificationSettings(model));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error UpdateLeadershipModelUpdateNotificationSettings: {ex.Message}"
+                    });
+            }
+        }
+        [HttpPut("UpdateTeacherModelUpdateNotificationSettings")]
+        [Authorize(Policy = "RequireTeacher")]
+        public async Task<IActionResult> UpdateTeacherModelUpdateNotificationSettings([FromBody] TeacherModelUpdateNotificationSettings model)
+        {
+            try
+            {
+                return Ok(await _interfaceUserRepository.UpdateTeacherUpdateNotificationSettings(model));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error UpdateTeacherModelUpdateNotificationSettings: {ex.Message}"
+                    });
+            }
+        }
+        [HttpPut("UpdateStudentModelUpdateNotificationSettings")]
+        [Authorize(Policy = "RequireStudent")]
+        public async Task<IActionResult> UpdateStudentModelUpdateNotificationSettings([FromBody] StudentModelUpdateNotificationSettings model)
+        {
+            try
+            {
+                return Ok(await _interfaceUserRepository.UpdateStudentModelUpdateNotificationSettings(model));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error UpdateStudentModelUpdateNotificationSettings: {ex.Message}"
                     });
             }
         }
@@ -270,6 +329,6 @@ namespace LearningManagementSystem.Controllers
                     });
             }
         }
-
+        #endregion
     }
 }

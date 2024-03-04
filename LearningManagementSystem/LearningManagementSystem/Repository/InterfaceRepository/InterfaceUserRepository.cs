@@ -9,19 +9,29 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
 {
     public interface InterfaceUserRepository
     {
+        //GET
         Task<List<UserViewModel>> GetAll(string searchString, string roleName,int page = 1);
+        Task<UserViewModel> GetUserById(string id);
+        ClaimsPrincipal ValidateToken(string token);
+
+        //POST
+        Task<APIResponse> RenewToken(TokenModel model);
         Task<APIResponse> SignIn(SignInModel model);
         Task<APIResponse> CreateLeadershipUser(UserModelAllType model);
         Task<APIResponse> CreateTeacherUser(UserModelAllType model);
-        Task<APIResponse> CreateStudentUser(UserModelAllType model);
-
+        Task<APIResponse> CreateStudentUser(UserModelAllType model);       
+        //PUT
         Task<APIResponse> UpdateUserPersonalInformation(string id,UserModelUpdateAllType model);
-        Task<APIResponse> ChangeUserAvatar(UserModelChangeAvatar model);
-        Task<APIResponse> RenewToken(TokenModel model);
-        ClaimsPrincipal ValidateToken(string token);
-
+        Task<APIResponse> UpdateLeadershipModelUpdateNotificationSettings(LeadershipModelUpdateNotificationSettings model);
+        Task<APIResponse> UpdateTeacherUpdateNotificationSettings(TeacherModelUpdateNotificationSettings model);
+        Task<APIResponse> UpdateStudentModelUpdateNotificationSettings(StudentModelUpdateNotificationSettings model);
         Task<APIResponse> ActiveUser(string id);
+        Task<APIResponse> ChangeUserAvatar(UserModelChangeAvatar model);
         Task<APIResponse> ChangePassword(UserChangePasswordModel model);
-        Task<UserViewModel> GetUserById(string id);
+        
+
+
+
+
     }
 }

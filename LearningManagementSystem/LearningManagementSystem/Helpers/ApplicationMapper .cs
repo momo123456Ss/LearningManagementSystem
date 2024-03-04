@@ -20,6 +20,10 @@ namespace LearningManagementSystem.Helpers
                 .ForMember(dest => dest.UserRoleViewModel, opt => opt.MapFrom(src => src.UserRole))
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName))
                 .ReverseMap();
+            CreateMap<User, LeadershipModelUpdateNotificationSettings>().ReverseMap();
+            CreateMap<User, TeacherModelUpdateNotificationSettings>().ReverseMap();
+            CreateMap<User, StudentModelUpdateNotificationSettings>().ReverseMap();
+
 
 
         }
