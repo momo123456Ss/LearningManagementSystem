@@ -8,14 +8,15 @@ using LearningManagementSystem.Models.TokenModel;
 using LearningManagementSystem.Models.UserModel;
 using LearningManagementSystem.Models.UserRoleModels;
 using LearningManagementSystem.Repository.InterfaceRepository;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.IO;
 
 namespace LearningManagementSystem.Repository
 {
@@ -37,7 +38,37 @@ namespace LearningManagementSystem.Repository
             this._mapper = mapper;
             this._httpContextAccessor = httpContextAccessor;
         }
-        //Private
+        //Private              
+        private MemoryStream GenerateImageStream(string firstName, string lastName)
+        {
+            // Generate a random background color
+            Random random = new Random();
+            Color backgroundColor = Color.FromArgb(random.Next(256), random.Next(256), random.Next(256));
+
+            // Create a bitmap with the random background color
+            Bitmap bitmap = new Bitmap(140, 100);
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.Clear(backgroundColor);
+
+                // Draw the first character of first name
+                using (Font font = new Font("Arial", 50))
+                {
+                    graphics.DrawString(firstName.Substring(0, 1).ToUpper(), font, Brushes.White, new PointF(10, 10));
+                }
+
+                // Draw the first character of last name
+                using (Font font = new Font("Arial", 50))
+                {
+                    graphics.DrawString(lastName.Substring(0, 1).ToUpper(), font, Brushes.White, new PointF(60, 10));
+                }
+            }
+
+            // Convert the bitmap to a MemoryStream
+            MemoryStream memoryStream = new MemoryStream();
+            bitmap.Save(memoryStream, ImageFormat.Png);
+            return memoryStream;
+        }
         private async Task<TokenModel> GenerateToken(User user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -407,7 +438,24 @@ namespace LearningManagementSystem.Repository
                 }
                 else
                 {
-                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                    using (var stream = new MemoryStream(GenerateImageStream(model.FirstName, model.LastName).ToArray()))
+                    {
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription("avataruser.png", stream)
+                        };
+
+                        var uploadResult = _cloudinary.Upload(uploadParams);
+                        imageUrl = uploadResult.SecureUrl.ToString();
+                    }
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
                 }
                 // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -483,7 +531,24 @@ namespace LearningManagementSystem.Repository
                 }
                 else
                 {
-                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                    using (var stream = new MemoryStream(GenerateImageStream(model.FirstName, model.LastName).ToArray()))
+                    {
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription("avataruser.png", stream)
+                        };
+
+                        var uploadResult = _cloudinary.Upload(uploadParams);
+                        imageUrl = uploadResult.SecureUrl.ToString();
+                    }
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
                 }
                 // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -559,7 +624,24 @@ namespace LearningManagementSystem.Repository
                 }
                 else
                 {
-                    imageUrl = "https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png";
+                    using (var stream = new MemoryStream(GenerateImageStream(model.FirstName, model.LastName).ToArray()))
+                    {
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription("avataruser.png", stream)
+                        };
+
+                        var uploadResult = _cloudinary.Upload(uploadParams);
+                        imageUrl = uploadResult.SecureUrl.ToString();
+                    }
+                    if (imageUrl == null)
+                    {
+                        return new APIResponse
+                        {
+                            Success = false,
+                            Message = "Upload image failed."
+                        };
+                    }
                 }
                 // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -747,95 +829,62 @@ namespace LearningManagementSystem.Repository
             // Lấy URL của hình ảnh hiện tại từ cơ sở dữ liệu hoặc từ bất kỳ nguồn nào khác
             string currentImageUrl = user.Avatar; // Giả sử user.Avatar là URL của hình ảnh hiện tại
 
-            if (currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
-            {
-                string imageUrl;
-                if (model.imageFile != null)
-                {
-                    // Tải lên ảnh lên Cloudinary
-                    var uploadParams = new ImageUploadParams()
-                    {
-                        File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
-                        // Các tham số tải lên khác
-                    };
-                    var uploadResult = _cloudinary.Upload(uploadParams);
 
-                    // Lấy URL của ảnh từ kết quả tải lên
-                    imageUrl = uploadResult.SecureUrl.ToString();
-                    if (imageUrl == null)
-                    {
-                        return new APIResponse
-                        {
-                            Success = false,
-                            Message = "Upload image failed."
-                        };
-                    }
-                }
-                else
-                {
-                    return new APIResponse { Success = true, Message = "No photo found" };
-                }
-                user.Avatar = imageUrl;
-                await _context.SaveChangesAsync();
-                return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
+            // Phân tích URL để lấy public ID của hình ảnh trên Cloudinary
+            string publicId = string.Empty;
+            if (!string.IsNullOrEmpty(currentImageUrl))
+            {
+                Uri uri = new Uri(currentImageUrl);
+                string path = uri.AbsolutePath;
+                // Cloudinary public ID là phần sau cùng của đường dẫn URL, loại bỏ phần đuôi mở rộng của tệp (ví dụ: .jpg, .png)
+                publicId = Path.GetFileNameWithoutExtension(path);
             }
-            else if (!currentImageUrl.Equals("https://res.cloudinary.com/dicxcmntw/image/upload/v1709443071/awzwxwub3veotajal6lc.png"))
+
+            // Sử dụng Cloudinary API để xóa hình ảnh sử dụng public ID
+            if (!string.IsNullOrEmpty(publicId))
             {
-                // Phân tích URL để lấy public ID của hình ảnh trên Cloudinary
-                string publicId = string.Empty;
-                if (!string.IsNullOrEmpty(currentImageUrl))
+                var deletionParams = new DeletionParams(publicId);
+                var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
+                // Kiểm tra xem hình ảnh đã được xóa thành công hay không
+                if (deletionResult.Result == "ok")
                 {
-                    Uri uri = new Uri(currentImageUrl);
-                    string path = uri.AbsolutePath;
-                    // Cloudinary public ID là phần sau cùng của đường dẫn URL, loại bỏ phần đuôi mở rộng của tệp (ví dụ: .jpg, .png)
-                    publicId = Path.GetFileNameWithoutExtension(path);
-                }
-
-                // Sử dụng Cloudinary API để xóa hình ảnh sử dụng public ID
-                if (!string.IsNullOrEmpty(publicId))
-                {
-                    var deletionParams = new DeletionParams(publicId);
-                    var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
-                    // Kiểm tra xem hình ảnh đã được xóa thành công hay không
-                    if (deletionResult.Result == "ok")
+                    // Xóa hình ảnh thành công
+                    string imageUrl;
+                    if (model.imageFile != null)
                     {
-                        // Xóa hình ảnh thành công
-                        string imageUrl;
-                        if (model.imageFile != null)
+                        // Tải lên ảnh lên Cloudinary
+                        var uploadParams = new ImageUploadParams()
                         {
-                            // Tải lên ảnh lên Cloudinary
-                            var uploadParams = new ImageUploadParams()
-                            {
-                                File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
-                                // Các tham số tải lên khác
-                            };
-                            var uploadResult = _cloudinary.Upload(uploadParams);
+                            File = new FileDescription(model.imageFile.FileName, model.imageFile.OpenReadStream()),
+                            // Các tham số tải lên khác
+                        };
+                        var uploadResult = _cloudinary.Upload(uploadParams);
 
-                            // Lấy URL của ảnh từ kết quả tải lên
-                            imageUrl = uploadResult.SecureUrl.ToString();
-                            if (imageUrl == null)
-                            {
-                                return new APIResponse
-                                {
-                                    Success = false,
-                                    Message = "Upload image failed."
-                                };
-                            }
-                        }
-                        else
+                        // Lấy URL của ảnh từ kết quả tải lên
+                        imageUrl = uploadResult.SecureUrl.ToString();
+                        if (imageUrl == null)
                         {
-                            return new APIResponse { Success = true, Message = "No photo found" };
+                            return new APIResponse
+                            {
+                                Success = false,
+                                Message = "Upload image failed."
+                            };
                         }
-                        user.Avatar = imageUrl;
-                        await _context.SaveChangesAsync();
-                        return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
                     }
                     else
                     {
-                        return new APIResponse { Success = false, Message = "Deleting current avatar failed" };
+                        return new APIResponse { Success = true, Message = "No photo found" };
                     }
+                    user.Avatar = imageUrl;
+                    await _context.SaveChangesAsync();
+                    return new APIResponse { Success = true, Message = "ChangeUserAvatar successfully" };
+                }
+                else
+                {
+                    return new APIResponse { Success = false, Message = "Deleting current avatar failed" };
                 }
             }
+
             return new APIResponse { Success = true, Message = "Something Error" };
 
         }

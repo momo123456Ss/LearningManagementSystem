@@ -9,6 +9,8 @@ namespace LearningManagementSystem.Entity
         public DbSet<User> Users { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<CloudinaryConfiguration> CloudinaryConfigurations { get; set; } = null!;
+        public DbSet<MailConfiguration> MailConfigurations { get; set; } = null!;
 
         #endregion
     }

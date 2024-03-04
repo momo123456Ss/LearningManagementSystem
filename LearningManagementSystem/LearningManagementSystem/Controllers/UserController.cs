@@ -1,15 +1,10 @@
 ﻿using LearningManagementSystem.Models.APIRespone;
 using LearningManagementSystem.Models.TokenModel;
 using LearningManagementSystem.Models.UserModel;
-using LearningManagementSystem.Models.UserRoleModels;
-using LearningManagementSystem.Repository;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Net.Mime;
-using System.Security.Claims;
 
 namespace LearningManagementSystem.Controllers
 {
@@ -24,9 +19,8 @@ namespace LearningManagementSystem.Controllers
         public UserController(InterfaceUserRepository interfaceUserRepository, IHttpClientFactory clientFactory = null)
         {
             this._interfaceUserRepository = interfaceUserRepository;
-            _clientFactory = clientFactory;
-        }
-
+            this._clientFactory = clientFactory;
+        }     
         //GET
         #region
         [HttpGet("DownloadFileFromCloudinary")]
@@ -91,7 +85,8 @@ namespace LearningManagementSystem.Controllers
             try
             {
                 return Ok(await _interfaceUserRepository.GetAll(userCodeOrEmailOrFullname, roleName, page));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(
                    new APIResponse
@@ -124,7 +119,8 @@ namespace LearningManagementSystem.Controllers
             {
                 return Ok(await _interfaceUserRepository.RenewToken(model));
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return BadRequest(new APIResponse
                 {
                     Success = false,
@@ -138,7 +134,8 @@ namespace LearningManagementSystem.Controllers
             try
             {
                 return Ok(await _interfaceUserRepository.SignIn(model));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(
                     new APIResponse
@@ -155,10 +152,12 @@ namespace LearningManagementSystem.Controllers
             try
             {
                 return Ok(await _interfaceUserRepository.CreateLeadershipUser(model));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(
-                    new APIResponse {
+                    new APIResponse
+                    {
                         Success = false,
                         Message = $"Error CreateLeadershipUser: {ex.Message}"
                     });
