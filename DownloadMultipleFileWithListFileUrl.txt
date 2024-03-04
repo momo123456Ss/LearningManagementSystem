@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+
+public class CloudinaryFileManager
+{
+    private readonly IHttpClientFactory _clientFactory;
+
+    public CloudinaryFileManager(IHttpClientFactory clientFactory)
+    {
+        _clientFactory = clientFactory;
+    }
+
+    public async Task<IActionResult> DownloadFilesAsZip(List<string> cloudinaryUrls, List<string> filenames)
+    {
+        try
+        {
+            if (cloudinaryUrls == null || cloudinaryUrls.Count == 0)
+            {
+                return BadRequest("No Cloudinary URLs provided");
+            }
+
+            if (filenames == null || filenames.Count != cloudinaryUrls.Count)
+            {
+                return BadRequest("Filenames list must be provided and have the same length as the URLs list");
+            }
+
+            var client = _clientFactory.CreateClient();
+
+            // Create a temporary directory to store downloaded files
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+
+            var fileTasks = new List<Task<string>>();
+
+            // Download files asynchronously
+            for (int i = 0; i < cloudinaryUrls.Count; i++)
+            {
+                fileTasks.Add(DownloadFileAsync(client, cloudinaryUrls[i], tempDir, filenames[i]));
+            }
+
+            await Task.WhenAll(fileTasks);
+
+            // Create a unique filename for the zipped file
+            string zipFileName = $"cloudinary_files_{DateTime.Now:yyyyMMddHHmmss}.zip";
+            string zipFilePath = Path.Combine(tempDir, zipFileName);
+
+            // Zip downloaded files
+            ZipFile.CreateFromDirectory(tempDir, zipFilePath);
+
+            // Read the zipped file
+            var zipFileBytes = await File.ReadAllBytesAsync(zipFilePath);
+
+            // Delete temporary directory and files
+            Directory.Delete(tempDir, true);
+
+            // Return the zipped file
+            return File(zipFileBytes, "application/zip", zipFileName);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error downloading files and creating zip: {ex.Message}");
+        }
+    }
+
+    private async Task<string> DownloadFileAsync(HttpClient client, string url, string directory, string filename)
+    {
+        var filePath = Path.Combine(directory, filename);
+
+        using (var response = await client.GetAsync(url))
+        {
+            if (response.IsSuccessStatusCode)
+            {
+                using (var fileStream = File.Create(filePath))
+                {
+                    await response.Content.CopyToAsync(fileStream);
+                }
+            }
+            else
+            {
+                throw new Exception($"Failed to download file from {url}");
+            }
+        }
+
+        return filePath;
+    }
+}
