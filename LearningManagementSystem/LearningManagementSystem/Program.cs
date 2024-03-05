@@ -38,6 +38,9 @@ builder.Services.AddDbContext<LearningManagementSystemContext>(option
 builder.Services.AddScoped<InterfaceUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<InterfaceUserRepository, UserRepository>();
 builder.Services.AddScoped<InterfaceMailRepository, MailRepository>();
+builder.Services.AddScoped<InterfaceClassRepository, ClassRepository>();
+builder.Services.AddScoped<InterfaceFacultyRepository, FacultyRepository>();
+builder.Services.AddScoped<InterfaceUserBelongToFacultyRepository, UserBelongToFacultyRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

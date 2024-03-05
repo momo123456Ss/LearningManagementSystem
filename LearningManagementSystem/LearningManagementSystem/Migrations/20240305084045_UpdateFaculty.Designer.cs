@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240305084045_UpdateFaculty")]
+    partial class UpdateFaculty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,13 +115,21 @@ namespace LearningManagementSystem.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<Guid>("HeadOfDepartment")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("NumberOfStudents")
                         .HasColumnType("int");
 
                     b.Property<int>("NumberOfTeacher")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("FacultyId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Faculty");
                 });
@@ -339,32 +349,6 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.UserBelongToFaculty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<Guid>("FacultyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsHeadOfDepartment")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FacultyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserBelongToFaculty");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.UserRole", b =>
                 {
                     b.Property<Guid>("RoleId")
@@ -473,6 +457,17 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("UserRole");
                 });
 
+            modelBuilder.Entity("LearningManagementSystem.Entity.Faculty", b =>
+                {
+                    b.HasOne("LearningManagementSystem.Entity.User", "User")
+                        .WithMany("Facultys")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LearningManagementSystem.Entity.RefreshToken", b =>
                 {
                     b.HasOne("LearningManagementSystem.Entity.User", "User")
@@ -495,35 +490,11 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.UserBelongToFaculty", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.Faculty", "Faculty")
-                        .WithMany("UserBelongToFacultys")
-                        .HasForeignKey("FacultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LearningManagementSystem.Entity.User", "User")
-                        .WithMany("UserBelongToFacultys")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Faculty");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.Faculty", b =>
-                {
-                    b.Navigation("UserBelongToFacultys");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>
                 {
-                    b.Navigation("RefreshTokens");
+                    b.Navigation("Facultys");
 
-                    b.Navigation("UserBelongToFacultys");
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.UserRole", b =>

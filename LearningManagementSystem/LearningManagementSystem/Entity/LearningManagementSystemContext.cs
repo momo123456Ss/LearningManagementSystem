@@ -11,7 +11,9 @@ namespace LearningManagementSystem.Entity
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
         public DbSet<CloudinaryConfiguration> CloudinaryConfigurations { get; set; } = null!;
         public DbSet<MailConfiguration> MailConfigurations { get; set; } = null!;
-
+        public DbSet<Class> Classs { get; set; } = null!;
+        public DbSet<Faculty> Facultys { get; set; } = null!;
+        public DbSet<UserBelongToFaculty> UserBelongToFacultys { get; set; } = null!;
         #endregion
     }
 }

@@ -6,10 +6,14 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
 {
     public interface InterfaceUserRoleRepository
     {
+        //GET
         Task<List<UserRoleViewModel>> GetAll();
         Task<APIResponse> GetById(string id);
+        //POST
         Task<APIResponse> CreateNew(UserRoleModel model);
-        Task<APIResponse> DeleteById(string id);
+        //PUT
         Task<APIResponse> UpdateById(string id, UserRoleModel model);
+        //DELETE
+        Task<APIResponse> DeleteById(string id);
     }
 }
