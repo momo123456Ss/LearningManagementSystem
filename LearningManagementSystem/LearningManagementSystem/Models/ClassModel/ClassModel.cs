@@ -7,6 +7,7 @@ namespace LearningManagementSystem.Models.ClassModel
         public Guid ClassId { get; set; }
         public string? ClassCode { get; set; }
         public string? ClassName { get; set; }
+        public string? Semester { get; set; }
         public string? AcademicYear { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm:ss}", ApplyFormatInEditMode = true)]
         public DateTime? ClassOpeningDay { get; set; }
@@ -24,6 +25,9 @@ namespace LearningManagementSystem.Models.ClassModel
         [MaxLength(100)]
         public string AcademicYear { get; set; }
         [Required]
+        [MaxLength(1)]
+        public string? Semester { get; set; }
+        [Required]
         public DateTime ClassOpeningDay { get; set; }
         public DateTime? ClassClosingDay { get; set; }
     }
@@ -33,6 +37,8 @@ namespace LearningManagementSystem.Models.ClassModel
         public string? ClassCode { get; set; }
         [MaxLength(100)]
         public string? ClassName { get; set; }
+        [MaxLength(1)]
+        public string? Semester { get; set; }
         [MaxLength(100)]
         public string? AcademicYear { get; set; }
         public DateTime? ClassOpeningDay { get; set; }

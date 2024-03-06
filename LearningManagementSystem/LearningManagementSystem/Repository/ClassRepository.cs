@@ -88,8 +88,11 @@ namespace LearningManagementSystem.Repository
         #region
         public async Task<APIResponse> CreateNewClass(ClassModelCreate model)
         {
+            string currentYear = DateTime.Now.Year.ToString().Substring(2);
+            string classSemester = currentYear + model.Semester;
             var newClass = _mapper.Map<Class>(model);
             newClass.ClassId = Guid.NewGuid();
+            newClass.Semester = classSemester;
             await _context.AddAsync(newClass);
             await _context.SaveChangesAsync();
             return new APIResponse

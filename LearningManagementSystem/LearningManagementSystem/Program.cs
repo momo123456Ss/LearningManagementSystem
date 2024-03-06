@@ -41,6 +41,9 @@ builder.Services.AddScoped<InterfaceMailRepository, MailRepository>();
 builder.Services.AddScoped<InterfaceClassRepository, ClassRepository>();
 builder.Services.AddScoped<InterfaceFacultyRepository, FacultyRepository>();
 builder.Services.AddScoped<InterfaceUserBelongToFacultyRepository, UserBelongToFacultyRepository>();
+builder.Services.AddScoped<InterfaceSubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<InterfaceOtherSubjectInformationRepository, OtherSubjectInformationRepository>();
+builder.Services.AddScoped<InterfaceSubjectTopicRepository, SubjectTopicRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

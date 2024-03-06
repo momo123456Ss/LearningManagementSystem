@@ -14,6 +14,10 @@ namespace LearningManagementSystem.Entity
         public DbSet<Class> Classs { get; set; } = null!;
         public DbSet<Faculty> Facultys { get; set; } = null!;
         public DbSet<UserBelongToFaculty> UserBelongToFacultys { get; set; } = null!;
+        public DbSet<OtherSubjectInformation> OtherSubjectInformations { get; set; } = null!;
+        public DbSet<Subject> Subjects { get; set; } = null!;
+        public DbSet<SubjectTopic> SubjectTopics { get; set; } = null!;
+
         #endregion
     }
 }

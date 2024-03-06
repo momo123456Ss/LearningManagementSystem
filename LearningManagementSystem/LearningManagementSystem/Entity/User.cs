@@ -20,6 +20,7 @@ namespace LearningManagementSystem.Entity
         {
             RefreshTokens = new HashSet<RefreshToken>();
             UserBelongToFacultys = new HashSet<UserBelongToFaculty>();
+            Subjects = new HashSet<Subject>();
         }
         [Key]
         public Guid UserId {  get; set; }
@@ -142,6 +143,8 @@ namespace LearningManagementSystem.Entity
         public ICollection<RefreshToken> RefreshTokens { get; set; }
         [JsonIgnore]
         public ICollection<UserBelongToFaculty> UserBelongToFacultys { get; set; }
+        [JsonIgnore]
+        public ICollection<Subject> Subjects { get; set; }
         #endregion
 
     }

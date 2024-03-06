@@ -16,6 +16,8 @@ namespace LearningManagementSystem.Entity
         [Required]
         [MaxLength(100)]
         public string AcademicYear { get; set; }
+        [MaxLength(10)]
+        public string? Semester {  get; set; }
         [Required]
         public DateTime ClassOpeningDay { get; set; }
         public DateTime ClassClosingDay { get; set;}

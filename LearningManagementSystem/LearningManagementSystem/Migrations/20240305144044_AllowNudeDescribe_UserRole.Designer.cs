@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240305144044_AllowNudeDescribe_UserRole")]
+    partial class AllowNudeDescribe_UserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,10 +50,6 @@ namespace LearningManagementSystem.Migrations
 
                     b.Property<DateTime>("ClassOpeningDay")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Semester")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("ClassId");
 
@@ -172,35 +170,6 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("MailConfiguration");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.OtherSubjectInformation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("OtherSubjectDescription")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("OtherSubjectTitle")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid?>("SubjectId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("OtherSubjectInformation");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -235,61 +204,6 @@ namespace LearningManagementSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.Subject", b =>
-                {
-                    b.Property<Guid>("SubjectId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("LecturerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SubjectCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SubjectDescription")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("SubjectName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("SubjectId");
-
-                    b.HasIndex("LecturerId");
-
-                    b.ToTable("Subject");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.SubjectTopic", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<Guid?>("SubjectId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SubjectTopicTitle")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("SubjectTopic");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>
@@ -560,17 +474,6 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("UserRole");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.OtherSubjectInformation", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.Subject", "SubjectNavigation")
-                        .WithMany("OtherSubjectInformations")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubjectNavigation");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.RefreshToken", b =>
                 {
                     b.HasOne("LearningManagementSystem.Entity.User", "User")
@@ -580,26 +483,6 @@ namespace LearningManagementSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.Subject", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.User", "UserNavigation")
-                        .WithMany("Subjects")
-                        .HasForeignKey("LecturerId");
-
-                    b.Navigation("UserNavigation");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.SubjectTopic", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.Subject", "SubjectIdNavigation")
-                        .WithMany("SubjectTopics")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubjectIdNavigation");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>
@@ -637,18 +520,9 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("UserBelongToFacultys");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.Subject", b =>
-                {
-                    b.Navigation("OtherSubjectInformations");
-
-                    b.Navigation("SubjectTopics");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>
                 {
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("Subjects");
 
                     b.Navigation("UserBelongToFacultys");
                 });
