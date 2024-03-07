@@ -8,6 +8,7 @@ using LearningManagementSystem.Models.UserRoleModels;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing.Printing;
+using System.Security.Claims;
 
 namespace LearningManagementSystem.Repository
 {
@@ -16,11 +17,14 @@ namespace LearningManagementSystem.Repository
         private readonly LearningManagementSystemContext _context;
         private readonly IMapper _mapper;
         private static int PAGE_SIZE { get; set; } = 5;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SubjectRepository(LearningManagementSystemContext context, IMapper mapper)
+
+        public SubjectRepository(LearningManagementSystemContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             this._context = context;
             this._mapper = mapper;
+            this._httpContextAccessor = httpContextAccessor;
         }
         //GET
         #region
@@ -74,6 +78,73 @@ namespace LearningManagementSystem.Repository
                 };
             }
         }
+        public async Task<APIResponse> GetSubjectByUserId(string searchString, string sortBy, int page = 1)
+        {
+            try
+            {
+                var user = await _context.Users.Include(role => role.UserRole)
+                          .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+
+                var allSubject = _context.Subjects
+                    .Include(ur => ur.UserNavigation)
+                        .ThenInclude(ur => ur.UserRole)
+                    .Include(s => s.OtherSubjectInformations)
+                    .Include(s => s.SubjectTopics)
+                    .Where(s => s.UserNavigation.UserId == user.UserId).AsQueryable();
+
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    searchString = searchString.ToLower();
+                    allSubject = allSubject.Where(f =>
+                        f.SubjectCode.ToLower().Contains(searchString) ||
+                        f.SubjectName.ToLower().Contains(searchString)
+                    );
+                }
+                allSubject = allSubject.OrderBy(sb => sb.SubjectName);
+                if (!string.IsNullOrEmpty(sortBy))
+                {
+                    switch (sortBy)
+                    {
+                        case "sname_asc":
+                            allSubject = allSubject.OrderBy(s => s.SubjectName);
+                            break;
+                        case "sname_desc":
+                            allSubject = allSubject.OrderByDescending(s => s.SubjectName);
+                            break;
+                        case "lscode_asc":
+                            allSubject = allSubject.OrderBy(s => s.LastRecent);
+                            break;
+                        case "lscode_desc":
+                            allSubject = allSubject.OrderByDescending(s => s.LastRecent);
+                            break;                      
+                    }
+                }
+                if (page < 1)
+                {
+                    return new APIResponse
+                    {
+                        Success = true,
+                        Message = "Had found.",
+                        Data = _mapper.Map<List<SubjectModelView>>(allSubject)
+                    };
+                }
+                var result = PaginatedList<Subject>.Create(allSubject, page, PAGE_SIZE);
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Had found.",
+                    Data = _mapper.Map<List<SubjectModelView>>(result)
+                };
+            }
+            catch
+            {
+                return new APIResponse
+                {
+                    Success = false,
+                    Message = "Not found.",
+                };
+            }
+        }
         #endregion
         //POST
         #region
@@ -105,6 +176,37 @@ namespace LearningManagementSystem.Repository
         #endregion
         //PUT
         #region
+        public async Task<APIResponse> UpdateLastRecentBySubjectId(string subjectId)
+        {
+            try
+            {
+                // Lấy người dùng từ email của người dùng hiện tại
+                var user = await _context.Users.Include(role => role.UserRole)
+                    .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+                // Kiểm tra xem người dùng có đang tham gia vào môn học có SubjectId không
+                var subject = await _context.Subjects
+                    .Include(s => s.UserNavigation)
+                    .FirstOrDefaultAsync(s => s.SubjectId == Guid.Parse(subjectId) 
+                    && s.UserNavigation.UserId.Equals(user.UserId));
+                if (subject == null)
+                {
+                    return new APIResponse { Success = false, Message = "Subject-Teacher not found." };
+                }
+
+                // Cập nhật LastRecent cho người dùng
+                subject.LastRecent = DateTime.UtcNow;
+
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _context.SaveChangesAsync();
+
+                return new APIResponse { Success = true, Message = "LastRecent updated successfully." };
+            }
+            catch (Exception ex)
+            {
+                return new APIResponse { Success = false, Message = $"Error updating LastRecent: {ex.Message}" };
+            }
+        }
+
         public async Task<APIResponse> UpdateById(string id, SubjectModelUpdate model)
         {
             try

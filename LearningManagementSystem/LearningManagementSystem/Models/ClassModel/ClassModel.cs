@@ -29,7 +29,7 @@ namespace LearningManagementSystem.Models.ClassModel
         [MaxLength(100)]
         public string AcademicYear { get; set; }
         [Required]
-        [MaxLength(1)]
+        [MaxLength(10)]
         public string? Semester { get; set; }
         [Required]
         public DateTime ClassOpeningDay { get; set; }

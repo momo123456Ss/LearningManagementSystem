@@ -7,6 +7,7 @@ using MailKit;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
@@ -33,6 +34,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddDbContext<LearningManagementSystemContext>(option
     => option.UseSqlServer(builder.Configuration.GetConnectionString("LearningManagementSystem")));
 builder.Services.AddScoped<InterfaceUserRoleRepository, UserRoleRepository>();
@@ -44,6 +46,7 @@ builder.Services.AddScoped<InterfaceUserBelongToFacultyRepository, UserBelongToF
 builder.Services.AddScoped<InterfaceSubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<InterfaceOtherSubjectInformationRepository, OtherSubjectInformationRepository>();
 builder.Services.AddScoped<InterfaceSubjectTopicRepository, SubjectTopicRepository>();
+builder.Services.AddScoped<InterfaceUserClassSubjectRepository, UserClassSubjectRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

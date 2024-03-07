@@ -6,6 +6,7 @@ using LearningManagementSystem.Models.OtherSubjectInformationModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Models.SubjectTopicModel;
 using LearningManagementSystem.Models.UserBelongToFacultyModel;
+using LearningManagementSystem.Models.UserClassSubjectModel;
 using LearningManagementSystem.Models.UserModel;
 using LearningManagementSystem.Models.UserRoleModels;
 
@@ -54,7 +55,7 @@ namespace LearningManagementSystem.Helpers
             //Subject
             #region
             CreateMap<Subject, SubjectModelView>()
-                .ForMember(dest => dest.UserViewModel, opt => opt.MapFrom(src => src.UserNavigation))
+                .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.UserNavigation))
                 .ForMember(dest => dest.OtherSubjectInformationModelViews, opt => opt.MapFrom(src => src.OtherSubjectInformations))
                 .ForMember(dest => dest.SubjectTopics, opt => opt.MapFrom(src => src.SubjectTopics))
                 .ReverseMap();
@@ -73,6 +74,14 @@ namespace LearningManagementSystem.Helpers
             CreateMap<SubjectTopic, SubjectTopicModelView>().ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelCreate>().ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelUpdate>().ReverseMap();
+            #endregion
+            //UserClassSubject
+            #region
+            CreateMap<UserClassSubject, UserClassSubjectModelView>()
+                .ForMember(dest => dest.ClassNavigation, opt => opt.MapFrom(src => src.ClassNavigation))
+                .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
+                .ReverseMap();
+            CreateMap<UserClassSubject, UserClassSubjectModelCreate>().ReverseMap();
             #endregion
         }
     }

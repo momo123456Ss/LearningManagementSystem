@@ -38,7 +38,8 @@ namespace LearningManagementSystem.Models.SubjectModel
         public string? SubjectCode { get; set; }
         public string? SubjectName { get; set; }
         public string? SubjectDescription { get; set; }
-        public UserViewModel? UserViewModel { get; set; }
+        public UserViewModel? Lecturer { get; set; }
+        public DateTime? LastRecent { get; set; }
         public ICollection<OtherSubjectInformationModelView>? OtherSubjectInformationModelViews { get; set; }
         public ICollection<SubjectTopicModelView>? SubjectTopics { get; set; }
 

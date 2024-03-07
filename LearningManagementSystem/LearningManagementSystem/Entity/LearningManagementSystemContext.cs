@@ -17,7 +17,12 @@ namespace LearningManagementSystem.Entity
         public DbSet<OtherSubjectInformation> OtherSubjectInformations { get; set; } = null!;
         public DbSet<Subject> Subjects { get; set; } = null!;
         public DbSet<SubjectTopic> SubjectTopics { get; set; } = null!;
-
+        public DbSet<UserClassSubject> UserClassSubjects { get; set; } = null!;
         #endregion
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserClassSubject>()
+                .HasKey(ucs => new { ucs.UserId, ucs.ClassId, ucs.SubjectId });
+        }
     }
 }

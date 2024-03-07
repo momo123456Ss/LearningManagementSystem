@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240307051746_CreateTable-UserClassSubject-0703")]
+    partial class CreateTableUserClassSubject0703
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,9 +250,6 @@ namespace LearningManagementSystem.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("LastRecent")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid?>("LecturerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -471,12 +470,6 @@ namespace LearningManagementSystem.Migrations
 
                     b.Property<Guid?>("SubjectId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("LastRecent")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Mark")
-                        .HasColumnType("bit");
 
                     b.HasKey("UserId", "ClassId", "SubjectId");
 

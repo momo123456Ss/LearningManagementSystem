@@ -1,11 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LearningManagementSystem.Migrations;
+using Org.BouncyCastle.Utilities;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LearningManagementSystem.Entity
 {
     [Table("Class")]
     public class Class
     {
+        public Class()
+        {
+            UserClassSubjects = new HashSet<UserClassSubject>();
+        }
         [Key]
         public Guid ClassId { get; set; }
         [MaxLength(50)]
@@ -27,6 +34,11 @@ namespace LearningManagementSystem.Entity
         public Guid? Faculty { get; set; }
         [ForeignKey("Faculty")]
         public Faculty FacultyNavigation { get; set; }
+        #endregion
+        //one-to-many
+        #region
+        [JsonIgnore]
+        public ICollection<UserClassSubject> UserClassSubjects { get; set; }
         #endregion
     }
 }

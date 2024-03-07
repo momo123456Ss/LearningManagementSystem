@@ -10,6 +10,8 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
         #region
         Task<List<SubjectModelView>> GetAll(string searchString, int page = 1);
         Task<APIResponse> GetById(string id);
+        Task<APIResponse> GetSubjectByUserId(string searchString, string sortBy, int page = 1);
+
         #endregion
         //POST
         #region
@@ -18,6 +20,8 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
         //PUT
         #region
         Task<APIResponse> UpdateById(string id, SubjectModelUpdate model);
+        Task<APIResponse> UpdateLastRecentBySubjectId(string subjectId);
+
         #endregion
     }
 }

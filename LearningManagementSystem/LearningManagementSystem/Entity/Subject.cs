@@ -14,6 +14,7 @@ namespace LearningManagementSystem.Entity
         {
             OtherSubjectInformations = new HashSet<OtherSubjectInformation>();
             SubjectTopics = new HashSet<SubjectTopic>();
+            UserClassSubjects = new HashSet<UserClassSubject>();
         }
         [Key]
         public Guid SubjectId {get; set;}
@@ -27,7 +28,7 @@ namespace LearningManagementSystem.Entity
         [MaxLength(255)]
         public string SubjectDescription { get; set; }
 
-
+        public DateTime? LastRecent {  get; set; }
         //Khóa ngoại
         //Many-to-one
         #region
@@ -39,6 +40,8 @@ namespace LearningManagementSystem.Entity
         #region
         public ICollection<OtherSubjectInformation> OtherSubjectInformations { get; set; }
         public ICollection<SubjectTopic> SubjectTopics { get; set; }
+        [JsonIgnore]
+        public ICollection<UserClassSubject> UserClassSubjects { get; set; }
         #endregion
     }
 }
