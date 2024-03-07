@@ -35,7 +35,9 @@ namespace LearningManagementSystem.Helpers
             #endregion
             //Class
             #region
-            CreateMap<Class, ClassModelView>().ReverseMap();
+            CreateMap<Class, ClassModelView>()
+                .ForMember(dest => dest.FacultyModelViewNavigation, opt => opt.MapFrom(src => src.FacultyNavigation))
+                .ReverseMap();
             CreateMap<Class, ClassModelCreate>().ReverseMap();
             CreateMap<Class, ClassModelUpdate>().ReverseMap();
             #endregion

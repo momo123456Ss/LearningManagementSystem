@@ -21,5 +21,12 @@ namespace LearningManagementSystem.Entity
         [Required]
         public DateTime ClassOpeningDay { get; set; }
         public DateTime ClassClosingDay { get; set;}
+        //khóa ngoại
+        //many-to-one
+        #region
+        public Guid? Faculty { get; set; }
+        [ForeignKey("Faculty")]
+        public Faculty FacultyNavigation { get; set; }
+        #endregion
     }
 }

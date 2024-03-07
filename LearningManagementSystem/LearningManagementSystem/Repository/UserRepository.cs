@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.IO;
+using Microsoft.AspNetCore.Identity;
 
 namespace LearningManagementSystem.Repository
 {

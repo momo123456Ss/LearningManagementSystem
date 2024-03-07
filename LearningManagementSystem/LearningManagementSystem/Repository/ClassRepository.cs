@@ -35,31 +35,34 @@ namespace LearningManagementSystem.Repository
             }
 
             var classesStartBetween = await _context.Classs
-                .Where(c => c.ClassOpeningDay >= start && c.ClassOpeningDay <= end).ToListAsync();
+                .Where(c => c.ClassOpeningDay >= start && c.ClassOpeningDay <= end)
+                .Include(f => f.FacultyNavigation).ToListAsync();
             return _mapper.Map<List<ClassModelView>>(classesStartBetween);
         }
         public async Task<List<ClassModelView>> GetAllClassHasNotYetEnded()
         {
             var classesHasEnded = await _context.Classs
-                .Where(c => c.ClassClosingDay > DateTime.Now && c.ClassClosingDay != DateTime.MinValue).ToListAsync();
+                .Where(c => c.ClassClosingDay > DateTime.Now && c.ClassClosingDay != DateTime.MinValue)
+                .Include(f => f.FacultyNavigation).ToListAsync();
             return _mapper.Map<List<ClassModelView>>(classesHasEnded);
         }
         public async Task<List<ClassModelView>> GetAllClassHasEnded()
         {
             var classesHasEnded = await _context.Classs
-                .Where(c => c.ClassClosingDay < DateTime.Now && c.ClassClosingDay != DateTime.MinValue).ToListAsync();
+                .Where(c => c.ClassClosingDay < DateTime.Now && c.ClassClosingDay != DateTime.MinValue)
+                .Include(f => f.FacultyNavigation).ToListAsync();
             return _mapper.Map<List<ClassModelView>>(classesHasEnded);
         }
         public async Task<List<ClassModelView>> GetAllClassDoesNotHaveAnEndDateYet()
         {
             var classesWithoutEndDate = await _context.Classs
-                .Where(c => c.ClassClosingDay == DateTime.MinValue).ToListAsync();
+                .Where(c => c.ClassClosingDay == DateTime.MinValue).Include(f => f.FacultyNavigation).ToListAsync();
             return _mapper.Map<List<ClassModelView>>(classesWithoutEndDate);
         }
 
         public async Task<List<ClassModelView>> GetAll()
         {
-            return _mapper.Map<List<ClassModelView>>(await _context.Classs.ToListAsync());
+            return _mapper.Map<List<ClassModelView>>(await _context.Classs.Include(f => f.FacultyNavigation).ToListAsync());
         }
 
         public async Task<APIResponse> GetById(string id)
@@ -71,7 +74,8 @@ namespace LearningManagementSystem.Repository
                 {
                     Success = true,
                     Message = "Had found.",
-                    Data = _mapper.Map<ClassModelView>(await _context.Classs.FindAsync(Guid.Parse(id)))
+                    Data = _mapper.Map<ClassModelView>(await _context.Classs
+                    .Include(f => f.FacultyNavigation).FirstOrDefaultAsync(f => Guid.Parse(id).Equals(f.ClassId)))
                 };
             }
             catch

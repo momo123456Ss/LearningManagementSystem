@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LearningManagementSystem.Models.FacultyModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.ClassModel
 {
@@ -13,9 +14,12 @@ namespace LearningManagementSystem.Models.ClassModel
         public DateTime? ClassOpeningDay { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm:ss}", ApplyFormatInEditMode = true)]
         public DateTime? ClassClosingDay { get; set; }
+        public FacultyModelView? FacultyModelViewNavigation { get; set; }
     }
     public class ClassModelCreate
     {
+        [Required]
+        public Guid? Faculty { get; set; }
         [MaxLength(50)]
         public string ClassCode { get; set; }
         [Required]
@@ -33,6 +37,7 @@ namespace LearningManagementSystem.Models.ClassModel
     }
     public class ClassModelUpdate
     {
+        public Guid? Faculty { get; set; }
         [MaxLength(50)]
         public string? ClassCode { get; set; }
         [MaxLength(100)]

@@ -11,6 +11,7 @@ namespace LearningManagementSystem.Entity
         public Faculty()
         {
             UserBelongToFacultys = new HashSet<UserBelongToFaculty>();
+            Classes = new HashSet<Class>();
         }
         //Thông tin Faculty
         [Key]
@@ -42,6 +43,8 @@ namespace LearningManagementSystem.Entity
         #region
         [JsonIgnore]
         public ICollection<UserBelongToFaculty> UserBelongToFacultys { get; set; }
+        [JsonIgnore]
+        public ICollection<Class> Classes { get; set; }
         #endregion
     }
 }
