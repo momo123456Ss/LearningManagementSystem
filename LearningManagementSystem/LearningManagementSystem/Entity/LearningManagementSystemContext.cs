@@ -18,11 +18,20 @@ namespace LearningManagementSystem.Entity
         public DbSet<Subject> Subjects { get; set; } = null!;
         public DbSet<SubjectTopic> SubjectTopics { get; set; } = null!;
         public DbSet<UserClassSubject> UserClassSubjects { get; set; } = null!;
+        public DbSet<LecturesAndResources> LecturesAndResourcesL { get; set; } = null!;
+        public DbSet<Lesson> Lessons { get; set; } = null!;
+        public DbSet<LessonResources> LessonResourcess { get; set; } = null!;
+
+
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserClassSubject>()
                 .HasKey(ucs => new { ucs.UserId, ucs.ClassId, ucs.SubjectId });
+            modelBuilder.Entity<LessonResources>()
+                .HasOne(l => l.LessonNavigation)
+                .WithMany(lr => lr.LessonResourcess)
+                .OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

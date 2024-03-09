@@ -2,6 +2,7 @@
 using LearningManagementSystem.Entity;
 using LearningManagementSystem.Models.ClassModel;
 using LearningManagementSystem.Models.FacultyModel;
+using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Models.SubjectTopicModel;
@@ -54,6 +55,9 @@ namespace LearningManagementSystem.Helpers
             #endregion
             //Subject
             #region
+            CreateMap<Subject, Subject_LecturesAndResourcesModelView>()
+                .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.UserNavigation))
+                .ReverseMap();
             CreateMap<Subject, SubjectModelView>()
                 .ForMember(dest => dest.Lecturer, opt => opt.MapFrom(src => src.UserNavigation))
                 .ForMember(dest => dest.OtherSubjectInformationModelViews, opt => opt.MapFrom(src => src.OtherSubjectInformations))
@@ -82,6 +86,14 @@ namespace LearningManagementSystem.Helpers
                 .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
                 .ReverseMap();
             CreateMap<UserClassSubject, UserClassSubjectModelCreate>().ReverseMap();
+            #endregion
+            //LecturesAndResources
+            #region
+            CreateMap<LecturesAndResources, LecturesAndResourcesModelCreate>().ReverseMap();
+            CreateMap<LecturesAndResources, LecturesAndResourcesModelDowload>().ReverseMap();
+            CreateMap<LecturesAndResources, LecturesAndResourcesModelView>()
+                .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
+                .ReverseMap();
             #endregion
         }
     }

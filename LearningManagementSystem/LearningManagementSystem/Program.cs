@@ -47,6 +47,7 @@ builder.Services.AddScoped<InterfaceSubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<InterfaceOtherSubjectInformationRepository, OtherSubjectInformationRepository>();
 builder.Services.AddScoped<InterfaceSubjectTopicRepository, SubjectTopicRepository>();
 builder.Services.AddScoped<InterfaceUserClassSubjectRepository, UserClassSubjectRepository>();
+builder.Services.AddScoped<InterfaceLecturesAndResourcesRepository, LecturesAndResourcesRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -104,6 +105,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdministrator", policy => policy.RequireRole("Administrator".ToLower(), "Quản trị".ToLower()));
     options.AddPolicy("RequireTeacher", policy => policy.RequireRole("Giảng viên".ToLower()));
     options.AddPolicy("RequireStudent", policy => policy.RequireRole("Học viên".ToLower()));
+    options.AddPolicy("RequireAdministratorAndTeacher", policy =>
+    {
+        policy.RequireRole("Quản trị".ToLower(),"Giảng viên".ToLower());
+    });
 });
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();

@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240308085029_UpdateTable-LectureAndResource-AddColum-Status-0803")]
+    partial class UpdateTableLectureAndResourceAddColumStatus0803
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,60 +192,6 @@ namespace LearningManagementSystem.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("LecturesAndResources");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.Lesson", b =>
-                {
-                    b.Property<int>("LessonId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LessonId"), 1L, 1);
-
-                    b.Property<int?>("SubjectTopicId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<string>("SubjectTopicTitle")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("LessonId");
-
-                    b.HasIndex("SubjectTopicId");
-
-                    b.ToTable("Lesson");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.LessonResources", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<Guid?>("ClassId")
-                        .IsRequired()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("LecturesAndResourcesId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("LessonId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("LecturesAndResourcesId");
-
-                    b.HasIndex("LessonId");
-
-                    b.ToTable("LessonResources");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.MailConfiguration", b =>
@@ -727,43 +675,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectNavigation");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.Lesson", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.SubjectTopic", "SubjectTopicNavigation")
-                        .WithMany("Lessons")
-                        .HasForeignKey("SubjectTopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubjectTopicNavigation");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.LessonResources", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.Class", "ClassNavigation")
-                        .WithMany()
-                        .HasForeignKey("ClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LearningManagementSystem.Entity.LecturesAndResources", "LecturesAndResourcesNavigation")
-                        .WithMany("LessonResourcess")
-                        .HasForeignKey("LecturesAndResourcesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LearningManagementSystem.Entity.Lesson", "LessonNavigation")
-                        .WithMany("LessonResourcess")
-                        .HasForeignKey("LessonId")
-                        .IsRequired();
-
-                    b.Navigation("ClassNavigation");
-
-                    b.Navigation("LecturesAndResourcesNavigation");
-
-                    b.Navigation("LessonNavigation");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.OtherSubjectInformation", b =>
                 {
                     b.HasOne("LearningManagementSystem.Entity.Subject", "SubjectNavigation")
@@ -875,16 +786,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("UserBelongToFacultys");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.LecturesAndResources", b =>
-                {
-                    b.Navigation("LessonResourcess");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.Lesson", b =>
-                {
-                    b.Navigation("LessonResourcess");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.Subject", b =>
                 {
                     b.Navigation("LecturesAndResourcesL");
@@ -894,11 +795,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectTopics");
 
                     b.Navigation("UserClassSubjects");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.SubjectTopic", b =>
-                {
-                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>

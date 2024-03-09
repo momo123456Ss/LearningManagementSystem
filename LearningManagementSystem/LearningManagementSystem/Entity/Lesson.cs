@@ -4,32 +4,29 @@ using System.Text.Json.Serialization;
 
 namespace LearningManagementSystem.Entity
 {
-    [Table("SubjectTopic")]
-    public class SubjectTopic
+    [Table("Lesson")]
+    public class Lesson
     {
-        public SubjectTopic()
+        public Lesson()
         {
-            Lessons = new HashSet<Lesson>();
+            LessonResourcess = new HashSet<LessonResources>();
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        [Required]
+        public int LessonId { get; set; }
         [MaxLength(100)]
-        public string SubjectTopicTitle { get; set; }
-
+        public string? SubjectTopicTitle { get; set; }
         //Khóa ngoại
         //many-to-one
         #region
-        [JsonIgnore]
-        public Guid? SubjectId { get; set; }
-        [ForeignKey("SubjectId")]
-        public Subject SubjectIdNavigation { get; set; }
+        public int? SubjectTopicId { get; set; }
+        [ForeignKey("SubjectTopicId")]
+        public SubjectTopic SubjectTopicNavigation { get; set; }
         #endregion
         //one-to-many
         #region
         [JsonIgnore]
-        public virtual ICollection<Lesson> Lessons { get; set; }
+        public ICollection<LessonResources> LessonResourcess { get; set; }
         #endregion
     }
 }

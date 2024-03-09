@@ -44,4 +44,12 @@ namespace LearningManagementSystem.Models.SubjectModel
         public ICollection<SubjectTopicModelView>? SubjectTopics { get; set; }
 
     }
+    public class Subject_LecturesAndResourcesModelView
+    {
+        public Guid SubjectId { get; set; }
+        public string? SubjectCode { get; set; }
+        public string? SubjectName { get; set; }
+        public string? SubjectDescription { get; set; }
+        public UserViewModel? Lecturer { get; set; }
+    }
 }
