@@ -3,6 +3,7 @@ using LearningManagementSystem.Entity;
 using LearningManagementSystem.Models.ClassModel;
 using LearningManagementSystem.Models.FacultyModel;
 using LearningManagementSystem.Models.LecturesAndResourcesModel;
+using LearningManagementSystem.Models.LessonResources;
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Models.SubjectTopicModel;
@@ -75,7 +76,9 @@ namespace LearningManagementSystem.Helpers
             #endregion
             //SubjectTopic
             #region
-            CreateMap<SubjectTopic, SubjectTopicModelView>().ReverseMap();
+            CreateMap<SubjectTopic, SubjectTopicModelView>()
+                .ForMember(dest => dest.LessonNavigation, opt => opt.MapFrom(src => src.Lessons))
+                .ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelCreate>().ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelUpdate>().ReverseMap();
             #endregion
@@ -94,6 +97,11 @@ namespace LearningManagementSystem.Helpers
             CreateMap<LecturesAndResources, LecturesAndResourcesModelView>()
                 .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
                 .ReverseMap();
+            #endregion
+            //Lesson
+            #region
+            CreateMap<Lesson, LessonLectureModelCreate>().ReverseMap();
+            CreateMap<Lesson, LessonModelView>().ReverseMap();
             #endregion
         }
     }

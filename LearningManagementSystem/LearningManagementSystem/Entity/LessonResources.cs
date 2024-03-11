@@ -18,13 +18,13 @@ namespace LearningManagementSystem.Entity
         public Guid? ClassId { get; set; }
         //--
         [ForeignKey("LecturesAndResourcesId")]
-        public LecturesAndResources LecturesAndResourcesNavigation { get; set; }
+        public LecturesAndResources? LecturesAndResourcesNavigation { get; set; }
 
         [ForeignKey("LessonId")]
-        public Lesson LessonNavigation { get; set; }
+        public Lesson? LessonNavigation { get; set; }
 
         [ForeignKey("ClassId")]
-        public Class ClassNavigation { get; set; }
+        public Class? ClassNavigation { get; set; }
         #endregion
     }
 }

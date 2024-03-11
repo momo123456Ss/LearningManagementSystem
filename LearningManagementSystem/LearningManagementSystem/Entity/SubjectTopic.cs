@@ -28,7 +28,6 @@ namespace LearningManagementSystem.Entity
         #endregion
         //one-to-many
         #region
-        [JsonIgnore]
         public virtual ICollection<Lesson> Lessons { get; set; }
         #endregion
     }

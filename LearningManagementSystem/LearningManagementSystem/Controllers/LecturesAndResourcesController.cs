@@ -122,6 +122,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("DowloadLecturesOrResources")]
+        [Authorize]
         public async Task<IActionResult> DownloadFilesAsZip(List<int> fileIds)
         {
             try
@@ -134,6 +135,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPost("UploadLectureFile")]
+        [Authorize]
         public async Task<IActionResult> UploadLectureFile([FromForm] LecturesAndResourcesModelCreate model)
         {
             try
@@ -151,6 +153,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPost("UploadResoucerFile")]
+        [Authorize]
         public async Task<IActionResult> UploadResoucerFile([FromForm] LecturesAndResourcesModelCreate model)
         {
             try

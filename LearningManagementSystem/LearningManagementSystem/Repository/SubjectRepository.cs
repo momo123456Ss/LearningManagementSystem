@@ -35,6 +35,7 @@ namespace LearningManagementSystem.Repository
                     .ThenInclude(ur => ur.UserRole)
                 .Include(s => s.OtherSubjectInformations)
                 .Include(s => s.SubjectTopics)
+                    .ThenInclude(lr => lr.Lessons)
                 .AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -66,6 +67,7 @@ namespace LearningManagementSystem.Repository
                         .ThenInclude(ur => ur.UserRole)
                     .Include(s => s.OtherSubjectInformations)
                     .Include(s => s.SubjectTopics)
+                        .ThenInclude(lr => lr.Lessons)
                     .FirstOrDefaultAsync(s => s.SubjectId == Guid.Parse(id)))
                 };
             }
@@ -90,6 +92,7 @@ namespace LearningManagementSystem.Repository
                         .ThenInclude(ur => ur.UserRole)
                     .Include(s => s.OtherSubjectInformations)
                     .Include(s => s.SubjectTopics)
+                        .ThenInclude(lr => lr.Lessons)
                     .Where(s => s.UserNavigation.UserId == user.UserId).AsQueryable();
 
                 if (!string.IsNullOrEmpty(searchString))
@@ -116,7 +119,7 @@ namespace LearningManagementSystem.Repository
                             break;
                         case "lscode_desc":
                             allSubject = allSubject.OrderByDescending(s => s.LastRecent);
-                            break;                      
+                            break;
                     }
                 }
                 if (page < 1)
@@ -186,7 +189,7 @@ namespace LearningManagementSystem.Repository
                 // Kiểm tra xem người dùng có đang tham gia vào môn học có SubjectId không
                 var subject = await _context.Subjects
                     .Include(s => s.UserNavigation)
-                    .FirstOrDefaultAsync(s => s.SubjectId == Guid.Parse(subjectId) 
+                    .FirstOrDefaultAsync(s => s.SubjectId == Guid.Parse(subjectId)
                     && s.UserNavigation.UserId.Equals(user.UserId));
                 if (subject == null)
                 {

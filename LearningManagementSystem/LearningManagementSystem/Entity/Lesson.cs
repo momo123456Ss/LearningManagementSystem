@@ -15,10 +15,11 @@ namespace LearningManagementSystem.Entity
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LessonId { get; set; }
         [MaxLength(100)]
-        public string? SubjectTopicTitle { get; set; }
+        public string? LessonTitle { get; set; }
         //Khóa ngoại
         //many-to-one
         #region
+        [JsonIgnore]
         public int? SubjectTopicId { get; set; }
         [ForeignKey("SubjectTopicId")]
         public SubjectTopic SubjectTopicNavigation { get; set; }
