@@ -19,14 +19,12 @@ namespace LearningManagementSystem.Entity
         //Khóa ngoại
         //many-to-one
         #region
-        [JsonIgnore]
         public int? SubjectTopicId { get; set; }
         [ForeignKey("SubjectTopicId")]
         public SubjectTopic SubjectTopicNavigation { get; set; }
         #endregion
         //one-to-many
         #region
-        [JsonIgnore]
         public ICollection<LessonResources> LessonResourcess { get; set; }
         #endregion
     }

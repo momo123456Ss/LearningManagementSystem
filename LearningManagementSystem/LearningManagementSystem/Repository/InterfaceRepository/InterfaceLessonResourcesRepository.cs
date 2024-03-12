@@ -7,6 +7,8 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
     {
         //GET
         #region
+        Task<APIResponse> GetObjectByLessonId(string lessonId);
+        Task<APIResponse> GetObjectByLessonIdAndClassId(string lessonId, string classId);
         Task<APIResponse> GetListLecturesAndResourcesIdBySubjectTopicIdAndClassId(int subjectTopicId, string classId);
         #endregion
         //POST

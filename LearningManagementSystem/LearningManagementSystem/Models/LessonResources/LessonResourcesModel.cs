@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LearningManagementSystem.Entity;
+using LearningManagementSystem.Models.LecturesAndResourcesModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.LessonResources
 {
@@ -22,10 +24,10 @@ namespace LearningManagementSystem.Models.LessonResources
         public ICollection<Guid>? ClassId { get; set; }
 
     }
-    public class LessonModelView
+    public class LessonResourcesView
     {
-        public int? LessonId { get; set; }
-        public string? LessonTitle { get; set; }
+        public Guid? ClassId { get; set; }
+        public LecturesAndResourcesModelLessonView? LecturesAndResourcesNavigation { get; set; }
     }
     public class FileIdAndTopicTitle
     {

@@ -22,6 +22,40 @@ namespace LearningManagementSystem.Controllers
 
         //GET
         #region
+        [HttpGet("GetObjectByLessonId/{lessonId}")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
+        public async Task<IActionResult> GetObjectByLessonIdAndClassId(string lessonId)
+        {
+            try
+            {
+                return Ok(await _interfaceLessonResourcesRepository.GetObjectByLessonId(lessonId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = $"Error GetObjectByLessonIdAndClassId: {ex.Message}"
+                });
+            }
+        }
+        [HttpGet("GetObjectByLessonIdAndClassId/{lessonId}/class/{classId}")]
+        [Authorize (Policy = "RequireStudent")]
+        public async Task<IActionResult> GetObjectByLessonIdAndClassId(string lessonId, string classId)
+        {
+            try
+            {
+                return Ok(await _interfaceLessonResourcesRepository.GetObjectByLessonIdAndClassId(lessonId, classId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new APIResponse
+                {
+                    Success = false,
+                    Message = $"Error GetObjectByLessonIdAndClassId: {ex.Message}"
+                });
+            }
+        }
         [HttpGet("GetAllFileBySubjectTopIcId/{subjectTopicId}/class{classId}")]
         [Authorize]
         public async Task<IActionResult> GetAllFileBySubjectTopIcId(int subjectTopicId, string classId)

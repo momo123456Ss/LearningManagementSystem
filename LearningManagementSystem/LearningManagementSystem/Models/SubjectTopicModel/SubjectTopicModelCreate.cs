@@ -1,4 +1,5 @@
-﻿using LearningManagementSystem.Models.LessonResources;
+﻿using LearningManagementSystem.Models.LessonModel;
+using LearningManagementSystem.Models.LessonResources;
 using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.SubjectTopicModel
@@ -19,7 +20,7 @@ namespace LearningManagementSystem.Models.SubjectTopicModel
     {
         public int? Id { get; set; }
         public string? SubjectTopicTitle { get; set; }
-        public ICollection<LessonModelView>? LessonNavigation { get; set; }
+        //public ICollection<LessonModelView>? LessonNavigation { get; set; }
 
     }
 }

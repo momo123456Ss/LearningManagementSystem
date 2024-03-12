@@ -25,6 +25,43 @@ namespace LearningManagementSystem.Repository
 
         //GET
         #region
+        public async Task<APIResponse> GetObjectByLessonId(string lessonId)
+        {
+            var obj = await _context.LessonResourcess
+                .Include(lar => lar.LecturesAndResourcesNavigation)
+                .Include(l => l.LessonNavigation)
+                    .ThenInclude(l => l.SubjectTopicNavigation)
+                .Include(c => c.ClassNavigation)
+                .Where(lr => lr.LessonId == int.Parse(lessonId))
+                .Where(lr => lr.LecturesAndResourcesNavigation.Approve == true)
+                .Where(lr => lr.LecturesAndResourcesNavigation.TypeOfDocument.Equals("Bài giảng"))
+                .ToListAsync();
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Had found",
+                Data = _mapper.Map<List<LessonResourcesView>>(obj)
+            };
+        }
+        public async Task<APIResponse> GetObjectByLessonIdAndClassId(string lessonId, string classId)
+        {
+            var obj = await _context.LessonResourcess
+                .Include(lar => lar.LecturesAndResourcesNavigation)
+                .Include(l => l.LessonNavigation)
+                    .ThenInclude(l => l.SubjectTopicNavigation)
+                .Include(c => c.ClassNavigation)
+                .Where(lr => lr.ClassId.Equals(Guid.Parse(classId)))
+                .Where(lr => lr.LessonId == int.Parse(lessonId))
+                .Where(lr => lr.LecturesAndResourcesNavigation.Approve == true)
+                .Where(lr => lr.LecturesAndResourcesNavigation.TypeOfDocument.Equals("Bài giảng"))
+                .ToListAsync();
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Had found",
+                Data = _mapper.Map<List<LessonResourcesView>>(obj)
+            };
+        }
         public async Task<APIResponse> GetListLecturesAndResourcesIdBySubjectTopicIdAndClassId(int subjectTopicId, string classId)
         {
             var user = await _context.Users.Include(role => role.UserRole)
@@ -282,7 +319,7 @@ namespace LearningManagementSystem.Repository
                     Message = $"Error {ex.Message}",
                 };
             }
-        }       
+        }
         #endregion
         //PUT
         #region
