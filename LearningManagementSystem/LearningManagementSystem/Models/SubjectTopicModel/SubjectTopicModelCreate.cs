@@ -20,7 +20,7 @@ namespace LearningManagementSystem.Models.SubjectTopicModel
     {
         public int? Id { get; set; }
         public string? SubjectTopicTitle { get; set; }
-        //public ICollection<LessonModelView>? LessonNavigation { get; set; }
+        public ICollection<LessonModelView>? LessonNavigation { get; set; }
 
     }
 }

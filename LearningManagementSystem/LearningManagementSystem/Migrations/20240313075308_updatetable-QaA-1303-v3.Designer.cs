@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240313075308_updatetable-QaA-1303-v3")]
+    partial class updatetableQaA1303v3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -316,29 +318,6 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("OtherSubjectInformation");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.QaAFollowers", b =>
-                {
-                    b.Property<int>("QaAFollowersId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QaAFollowersId"), 1L, 1);
-
-                    b.Property<int>("QaAIdFollow")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserIdFollower")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("QaAFollowersId");
-
-                    b.HasIndex("QaAIdFollow");
-
-                    b.HasIndex("UserIdFollower");
-
-                    b.ToTable("QaAFollowers");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.QuestionAndAnswer", b =>
                 {
                     b.Property<int>("QuestionAndAnswerId")
@@ -351,9 +330,6 @@ namespace LearningManagementSystem.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("LessonIdComment")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfResponses")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("QaACreatedDate")
@@ -847,24 +823,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectNavigation");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.QaAFollowers", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.QuestionAndAnswer", "QuestionAndAnswerNavigation")
-                        .WithMany("QaAFollowerss")
-                        .HasForeignKey("QaAIdFollow")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LearningManagementSystem.Entity.User", "UserIdFollowerNavigation")
-                        .WithMany("QaAFollowerss")
-                        .HasForeignKey("UserIdFollower")
-                        .IsRequired();
-
-                    b.Navigation("QuestionAndAnswerNavigation");
-
-                    b.Navigation("UserIdFollowerNavigation");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.QuestionAndAnswer", b =>
                 {
                     b.HasOne("LearningManagementSystem.Entity.Class", "ClassNavigation")
@@ -1022,8 +980,6 @@ namespace LearningManagementSystem.Migrations
 
             modelBuilder.Entity("LearningManagementSystem.Entity.QuestionAndAnswer", b =>
                 {
-                    b.Navigation("QaAFollowerss");
-
                     b.Navigation("QaAInOtherQaAs");
 
                     b.Navigation("QaAReplyQaAs");
@@ -1047,8 +1003,6 @@ namespace LearningManagementSystem.Migrations
 
             modelBuilder.Entity("LearningManagementSystem.Entity.User", b =>
                 {
-                    b.Navigation("QaAFollowerss");
-
                     b.Navigation("QuestionAndAnswers");
 
                     b.Navigation("RefreshTokens");

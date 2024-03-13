@@ -1,4 +1,5 @@
 ﻿using LearningManagementSystem.Models.LessonResources;
+using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.LessonModel
 {
@@ -6,12 +7,17 @@ namespace LearningManagementSystem.Models.LessonModel
     {
         public int LessonId { get; set; }
         public string? LessonTitle { get; set; }
-        public ICollection<LessonResourcesView> LessonResourcess { get; set; }
+        //public ICollection<LessonResourcesView> LessonResourcess { get; set; }
 
     }
-    //public class LessonModelView
-    //{
-    //    public int LessonId { get; set; }
-    //    public string? LessonTitle { get; set; }
-    //}
+    public class LessonModelCreate
+    {
+        [Required]
+        public int SubjectTopicId { get; set; }
+        [Required]
+        public string LessonTitle { get; set; }
+        public ICollection<int> LectureId { get; set; }
+        public ICollection<int> ResourceId { get; set; }
+        public ICollection<Guid> ClassId { get; set; }
+    }
 }

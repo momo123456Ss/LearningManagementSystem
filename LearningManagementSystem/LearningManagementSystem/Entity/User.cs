@@ -22,6 +22,8 @@ namespace LearningManagementSystem.Entity
             UserBelongToFacultys = new HashSet<UserBelongToFaculty>();
             Subjects = new HashSet<Subject>();
             UserClassSubjects = new HashSet<UserClassSubject>();
+            QuestionAndAnswers = new HashSet<QuestionAndAnswer>();
+            QaAFollowerss = new HashSet<QaAFollowers>();
         }
         [Key]
         public Guid UserId {  get; set; }
@@ -148,6 +150,10 @@ namespace LearningManagementSystem.Entity
         public ICollection<Subject> Subjects { get; set; }
         [JsonIgnore]
         public ICollection<UserClassSubject> UserClassSubjects { get; set; }
+        [JsonIgnore]
+        public ICollection<QuestionAndAnswer> QuestionAndAnswers { get; set; }
+        [JsonIgnore]
+        public ICollection<QaAFollowers> QaAFollowerss { get; set; }
         #endregion
 
     }

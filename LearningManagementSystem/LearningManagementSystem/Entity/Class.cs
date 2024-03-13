@@ -13,6 +13,7 @@ namespace LearningManagementSystem.Entity
         {
             UserClassSubjects = new HashSet<UserClassSubject>();
             //LessonResourcess = new HashSet<LessonResources>();
+            QuestionAndAnswers = new HashSet<QuestionAndAnswer>();
         }
         [Key]
         public Guid ClassId { get; set; }
@@ -40,6 +41,8 @@ namespace LearningManagementSystem.Entity
         #region
         [JsonIgnore]
         public ICollection<UserClassSubject> UserClassSubjects { get; set; }
+        [JsonIgnore]
+        public ICollection<QuestionAndAnswer> QuestionAndAnswers { get; set; }
         //[JsonIgnore]
         //public ICollection<LessonResources> LessonResourcess { get; set; }
         #endregion

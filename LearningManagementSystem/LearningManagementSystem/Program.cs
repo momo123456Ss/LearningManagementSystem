@@ -49,6 +49,8 @@ builder.Services.AddScoped<InterfaceSubjectTopicRepository, SubjectTopicReposito
 builder.Services.AddScoped<InterfaceUserClassSubjectRepository, UserClassSubjectRepository>();
 builder.Services.AddScoped<InterfaceLecturesAndResourcesRepository, LecturesAndResourcesRepository>();
 builder.Services.AddScoped<InterfaceLessonResourcesRepository, LessonResourcesRepository>();
+builder.Services.AddScoped<InterfaceLessonRepository, LessonRepository>();
+builder.Services.AddScoped<InterfaceQaARepository, QaARepository>();
 
 builder.Services.AddAuthentication(options =>
 {

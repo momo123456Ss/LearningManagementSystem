@@ -21,7 +21,8 @@ namespace LearningManagementSystem.Entity
         public DbSet<LecturesAndResources> LecturesAndResourcesL { get; set; } = null!;
         public DbSet<Lesson> Lessons { get; set; } = null!;
         public DbSet<LessonResources> LessonResourcess { get; set; } = null!;
-
+        public DbSet<QuestionAndAnswer> QuestionAndAnswers { get; set; } = null!;
+        public DbSet<QaAFollowers> QaAFollowerss { get; set; } = null!;
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +33,23 @@ namespace LearningManagementSystem.Entity
                 .HasOne(l => l.LessonNavigation)
                 .WithMany(lr => lr.LessonResourcess)
                 .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<QaAFollowers>()
+               .HasOne(l => l.UserIdFollowerNavigation)
+               .WithMany(lr => lr.QaAFollowerss)
+               .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<QuestionAndAnswer>()
+                .HasOne(qa => qa.QaAInOtherQaANavigation)
+                .WithMany(qa => qa.QaAInOtherQaAs)
+                .HasForeignKey(qa => qa.QaAInOtherQaA)
+                .OnDelete(DeleteBehavior.Restrict); // (tuỳ chọn) Nếu bạn không muốn xóa hàng loạt, hãy sử dụng DeleteBehavior.Restrict
+
+            modelBuilder.Entity<QuestionAndAnswer>()
+                .HasOne(qa => qa.QaAReplyQaANavigation)
+                .WithMany(qa => qa.QaAReplyQaAs)
+                .HasForeignKey(qa => qa.QaAReplyQaA)
+                .OnDelete(DeleteBehavior.Restrict); // (tuỳ chọn) Nếu bạn không muốn xóa hàng loạt, hãy sử dụng DeleteBehavior.Restrict
         }
     }
 }

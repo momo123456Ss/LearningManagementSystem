@@ -10,6 +10,7 @@ namespace LearningManagementSystem.Entity
         public Lesson()
         {
             LessonResourcess = new HashSet<LessonResources>();
+            QuestionAndAnswers = new HashSet<QuestionAndAnswer>();
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,6 +27,9 @@ namespace LearningManagementSystem.Entity
         //one-to-many
         #region
         public ICollection<LessonResources> LessonResourcess { get; set; }
+        [JsonIgnore]
+        public ICollection<QuestionAndAnswer> QuestionAndAnswers { get; set; }
+
         #endregion
     }
 }

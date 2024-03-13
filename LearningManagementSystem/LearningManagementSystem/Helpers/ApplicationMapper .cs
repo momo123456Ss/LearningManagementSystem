@@ -6,6 +6,7 @@ using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Models.LessonModel;
 using LearningManagementSystem.Models.LessonResources;
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
+using LearningManagementSystem.Models.QaAModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Models.SubjectTopicModel;
 using LearningManagementSystem.Models.UserBelongToFacultyModel;
@@ -78,7 +79,7 @@ namespace LearningManagementSystem.Helpers
             //SubjectTopic
             #region
             CreateMap<SubjectTopic, SubjectTopicModelView>()
-                //.ForMember(dest => dest.LessonNavigation, opt => opt.MapFrom(src => src.Lessons))
+                .ForMember(dest => dest.LessonNavigation, opt => opt.MapFrom(src => src.Lessons))
                 .ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelCreate>().ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelUpdate>().ReverseMap();
@@ -103,14 +104,26 @@ namespace LearningManagementSystem.Helpers
             //Lesson
             #region
             CreateMap<Lesson, LessonLectureModelCreate>().ReverseMap();
-            CreateMap<Lesson, LessonModelView>()
-                .ReverseMap();
+            CreateMap<Lesson, LessonModelView>().ReverseMap();
+            CreateMap<Lesson, LessonModelCreate>().ReverseMap();
             #endregion
             //LessonResources
             #region
             CreateMap<LessonResources, LessonResourcesView>()
                 .ForMember(dest => dest.LecturesAndResourcesNavigation, opt => opt.MapFrom(src => src.LecturesAndResourcesNavigation))
                 .ReverseMap();
+            #endregion
+            //QaA
+            #region
+            CreateMap<QuestionAndAnswer, QaAModelCreate>()
+                .ReverseMap();
+            CreateMap<QuestionAndAnswer, QaAModelView>()
+               .ReverseMap();
+            CreateMap<QuestionAndAnswer, QaAModelUserView>()
+               .ForMember(dest => dest.UserViewModelNavigation, opt => opt.MapFrom(src => src.UserNavigation))
+               .ForMember(dest => dest.ClassModelViewNavigation, opt => opt.MapFrom(src => src.ClassNavigation))
+               .ForMember(dest => dest.LessonModelViewNavigation, opt => opt.MapFrom(src => src.LessonNavigation))
+               .ReverseMap();
             #endregion
         }
     }
