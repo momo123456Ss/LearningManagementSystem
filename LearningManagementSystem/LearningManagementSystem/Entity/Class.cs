@@ -14,6 +14,7 @@ namespace LearningManagementSystem.Entity
             UserClassSubjects = new HashSet<UserClassSubject>();
             //LessonResourcess = new HashSet<LessonResources>();
             QuestionAndAnswers = new HashSet<QuestionAndAnswer>();
+            SubjectAnnouncements = new HashSet<SubjectAnnouncement>();
         }
         [Key]
         public Guid ClassId { get; set; }
@@ -45,6 +46,8 @@ namespace LearningManagementSystem.Entity
         public ICollection<QuestionAndAnswer> QuestionAndAnswers { get; set; }
         //[JsonIgnore]
         //public ICollection<LessonResources> LessonResourcess { get; set; }
+        [JsonIgnore]
+        public ICollection<SubjectAnnouncement> SubjectAnnouncements { get; set; }
         #endregion
     }
 }

@@ -22,40 +22,43 @@ namespace LearningManagementSystem.Repository
         public async Task<APIResponse> GetById(string subjectTopicId, string classId)
         {
             #region
-            //var lessons = await _context.Lessons
+            //var lessons =  _context.Lessons
             //        .Include(lr => lr.LessonResourcess)
-            //            .ThenInclude(lar => lar.LecturesAndResourcesNavigation)
-            //        .Where(lesson => lesson.LessonResourcess.Any(lr => 
-            //                                lr.ClassNavigation.ClassId.ToString().ToLower().Equals(classId.ToLower()) && 
-            //                                lr.LecturesAndResourcesNavigation.Approve == true))
             //        .Where(lesson => lesson.SubjectTopicId == int.Parse(subjectTopicId))
-            //        .ToListAsync();
+            //        .AsQueryable();
+
+            //var lessonResource = await _context.LessonResourcess
+            //    .Include(lar => lar.LecturesAndResourcesNavigation)
+            //    .Where(lr => lr.ClassId.ToString().ToLower().Equals(classId.ToLower()) &&
+            //    lr.LecturesAndResourcesNavigation.Approve == true)
+            //    .ToListAsync();
+            //lessons = lessons.Where(l => l.LessonResourcess.Any(lr => lessonResource.Contains(lr)));
             #endregion
             #region
             var lessons = (from l in _context.Lessons
-                          join lr in _context.LessonResourcess on l.LessonId equals lr.LessonId
-                          join st in _context.SubjectTopics on l.SubjectTopicId equals st.Id
-                          join lar in _context.LecturesAndResourcesL on lr.LecturesAndResourcesId equals lar.Id
-                          where st.Id == int.Parse(subjectTopicId) &&
-                                lr.ClassId == Guid.Parse(classId) &&
-                                lar.Approve == true
-                          select new Lesson
-                          {
-                              LessonId = l.LessonId,
-                              LessonTitle = l.LessonTitle,
-                              LessonResourcess = l.LessonResourcess,
-                              //ClassId = lr.ClassId,
-                              //LecturesAndResourcesId = lar.Id,
-                              //FileName = lar.FileName,
-                              //FileUrl = lar.FileUrl
-                          });
+                           join lr in _context.LessonResourcess on l.LessonId equals lr.LessonId
+                           join st in _context.SubjectTopics on l.SubjectTopicId equals st.Id
+                           join lar in _context.LecturesAndResourcesL on lr.LecturesAndResourcesId equals lar.Id
+                           where st.Id == int.Parse(subjectTopicId) &&
+                                 lr.ClassId == Guid.Parse(classId) &&
+                                 lar.Approve == true
+                           select new Lesson
+                           {
+                               LessonId = l.LessonId,
+                               LessonTitle = l.LessonTitle,
+                               LessonResourcess = l.LessonResourcess,
+                               //ClassId = lr.ClassId,
+                               //LecturesAndResourcesId = lar.Id,
+                               //FileName = lar.FileName,
+                               //FileUrl = lar.FileUrl
+                           });
             #endregion
             var result = await lessons.Distinct().ToListAsync();
             return new APIResponse
             {
                 Success = true,
                 Message = "Had found.",
-                Data = result /*_mapper.Map<List<LessonModelView>>(lessons)*/
+                Data = result /*_mapper.Map<List<LessonModelView2>>(result)*/
             };
         }
         #endregion

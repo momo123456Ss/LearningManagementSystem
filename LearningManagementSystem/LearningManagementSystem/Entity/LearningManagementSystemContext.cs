@@ -23,6 +23,7 @@ namespace LearningManagementSystem.Entity
         public DbSet<LessonResources> LessonResourcess { get; set; } = null!;
         public DbSet<QuestionAndAnswer> QuestionAndAnswers { get; set; } = null!;
         public DbSet<QaAFollowers> QaAFollowerss { get; set; } = null!;
+        public DbSet<SubjectAnnouncement> SubjectAnnouncements { get; set; } = null!;
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,6 +50,18 @@ namespace LearningManagementSystem.Entity
                 .HasOne(qa => qa.QaAReplyQaANavigation)
                 .WithMany(qa => qa.QaAReplyQaAs)
                 .HasForeignKey(qa => qa.QaAReplyQaA)
+                .OnDelete(DeleteBehavior.Restrict); // (tuỳ chọn) Nếu bạn không muốn xóa hàng loạt, hãy sử dụng DeleteBehavior.Restrict
+            
+            modelBuilder.Entity<SubjectAnnouncement>()
+                .HasOne(qa => qa.SAInOtherSANavigation)
+                .WithMany(qa => qa.SAInOtherSAs)
+                .HasForeignKey(qa => qa.SAInOtherSA)
+                .OnDelete(DeleteBehavior.Restrict); // (tuỳ chọn) Nếu bạn không muốn xóa hàng loạt, hãy sử dụng DeleteBehavior.Restrict
+
+            modelBuilder.Entity<SubjectAnnouncement>()
+                .HasOne(qa => qa.SAReplySANavigation)
+                .WithMany(qa => qa.SAReplySAs)
+                .HasForeignKey(qa => qa.SAReplySA)
                 .OnDelete(DeleteBehavior.Restrict); // (tuỳ chọn) Nếu bạn không muốn xóa hàng loạt, hãy sử dụng DeleteBehavior.Restrict
         }
     }

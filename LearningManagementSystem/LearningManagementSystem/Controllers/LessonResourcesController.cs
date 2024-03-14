@@ -40,7 +40,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpGet("GetObjectByLessonIdAndClassId/{lessonId}/class/{classId}")]
-        [Authorize (Policy = "RequireStudent")]
+        [Authorize(Policy = "RequireStudent")]
         public async Task<IActionResult> GetObjectByLessonIdAndClassId(string lessonId, string classId)
         {
             try

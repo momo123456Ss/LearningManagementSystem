@@ -21,18 +21,18 @@ namespace LearningManagementSystem.Controllers
         //[HttpGet("GetById/{subjectTopicId}/class/{classId}")]
         //public async Task<IActionResult> GetById(string subjectTopicId, string classId)
         //{
-        //    //try
-        //    //{
+        //    try
+        //    {
         //        return Ok(await _interfaceSubjectTopicRepository.GetById(subjectTopicId, classId));
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    return BadRequest(new APIResponse
-        //    //    {
-        //    //        Success = false,
-        //    //        Message = $"Error GetById: {ex.Message}"
-        //    //    });
-        //    //}
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new APIResponse
+        //        {
+        //            Success = false,
+        //            Message = $"Error GetById: {ex.Message}"
+        //        });
+        //    }
         //}
         #endregion
         //POST

@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240314042524_CreateTable-SA-1403")]
+    partial class CreateTableSA1403
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -495,9 +497,6 @@ namespace LearningManagementSystem.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid>("SubjectIdAnnouncement")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserIdAnnouncement")
                         .HasColumnType("uniqueidentifier");
 
@@ -508,8 +507,6 @@ namespace LearningManagementSystem.Migrations
                     b.HasIndex("SAInOtherSA");
 
                     b.HasIndex("SAReplySA");
-
-                    b.HasIndex("SubjectIdAnnouncement");
 
                     b.HasIndex("UserIdAnnouncement");
 
@@ -994,12 +991,6 @@ namespace LearningManagementSystem.Migrations
                         .HasForeignKey("SAReplySA")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("LearningManagementSystem.Entity.Subject", "SubjectAnnouncementNavigation")
-                        .WithMany()
-                        .HasForeignKey("SubjectIdAnnouncement")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("LearningManagementSystem.Entity.User", "UserAnnouncementNavigation")
                         .WithMany("SubjectAnnouncements")
                         .HasForeignKey("UserIdAnnouncement")
@@ -1011,8 +1002,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SAInOtherSANavigation");
 
                     b.Navigation("SAReplySANavigation");
-
-                    b.Navigation("SubjectAnnouncementNavigation");
 
                     b.Navigation("UserAnnouncementNavigation");
                 });

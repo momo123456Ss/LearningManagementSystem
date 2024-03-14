@@ -7,6 +7,7 @@ using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Linq;
 using System.Security.Claims;
 
 namespace LearningManagementSystem.Repository
@@ -31,6 +32,8 @@ namespace LearningManagementSystem.Repository
             var user = await _context.Users.Include(role => role.UserRole)
                .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
             var QaA = _context.QuestionAndAnswers
+                .Include(u => u.UserNavigation)
+                .Include(f => f.QaAFollowerss)
                 .Include(c => c.ClassNavigation)
                 .Include(l => l.LessonNavigation)
                     .ThenInclude(st => st.SubjectTopicNavigation)
@@ -44,7 +47,9 @@ namespace LearningManagementSystem.Repository
             }
             if (lessonId != null)
             {
-                QaA = QaA.Where(qaa => qaa.LessonIdComment == lessonId);
+                QaA = QaA.Where(qaa => qaa.LessonIdComment == lessonId &&
+                                    qaa.QaAInOtherQaA == null &&
+                                    qaa.QaAReplyQaA == null); //QaAInOtherQaA và QaAReplyQaA = null thì đây là câu hỏi
             }
             if (!string.IsNullOrEmpty(classId))
             {
@@ -64,20 +69,21 @@ namespace LearningManagementSystem.Repository
             }
             if (QaAIsFollow)
             {
-                var isFollow = await _context.QaAFollowerss
+                ICollection<QaAFollowers> isFollow = await _context.QaAFollowerss
                     .Include(f => f.QuestionAndAnswerNavigation)
                     .Where(f => f.UserIdFollower.Equals(user.UserId) &&
                     f.QuestionAndAnswerNavigation.QaAInOtherQaA == null &&
                     f.QuestionAndAnswerNavigation.QaAReplyQaA == null)
                     .ToListAsync();
-                List<int> QaAID = new List<int>();
-                foreach (var qaa in isFollow)
-                {
-                    QaAID.Add(qaa.QaAIdFollow);
-                }
-                QaA = QaA.Where(qaa => QaAID.Contains(qaa.QuestionAndAnswerId));
+                //List<int> QaAID = new List<int>();
+                //foreach (var qaa in isFollow)
+                //{
+                //    QaAID.Add(qaa.QaAIdFollow);
+                //}
+                QaA = QaA.Where(qaa => qaa.QaAFollowerss.Any(follower => isFollow.Contains(follower)));
+                //QaA = QaA.Where(qaa => QaAID.Contains(qaa.QuestionAndAnswerId));
                 //QaA = QaA.Where(qaa => isFollow.Any(f => f.QaAIdFollow == qaa.QuestionAndAnswerId));
-                                                                
+
             }
             if ((bool)myQuestions)
             {

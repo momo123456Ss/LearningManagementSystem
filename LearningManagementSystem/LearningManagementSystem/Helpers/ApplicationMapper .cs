@@ -7,6 +7,7 @@ using LearningManagementSystem.Models.LessonModel;
 using LearningManagementSystem.Models.LessonResources;
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
 using LearningManagementSystem.Models.QaAModel;
+using LearningManagementSystem.Models.SAModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Models.SubjectTopicModel;
 using LearningManagementSystem.Models.UserBelongToFacultyModel;
@@ -105,6 +106,7 @@ namespace LearningManagementSystem.Helpers
             #region
             CreateMap<Lesson, LessonLectureModelCreate>().ReverseMap();
             CreateMap<Lesson, LessonModelView>().ReverseMap();
+            CreateMap<Lesson, LessonModelView2>().ReverseMap();
             CreateMap<Lesson, LessonModelCreate>().ReverseMap();
             #endregion
             //LessonResources
@@ -124,6 +126,10 @@ namespace LearningManagementSystem.Helpers
                .ForMember(dest => dest.ClassModelViewNavigation, opt => opt.MapFrom(src => src.ClassNavigation))
                .ForMember(dest => dest.LessonModelViewNavigation, opt => opt.MapFrom(src => src.LessonNavigation))
                .ReverseMap();
+            #endregion
+            //SubjectAnnouncement
+            #region
+            CreateMap<SubjectAnnouncement, SubjectAnnouncementModelCreate>().ReverseMap();
             #endregion
         }
     }
