@@ -15,9 +15,8 @@ namespace LearningManagementSystem.Entity
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SubjectAnnouncementId { get; set; }
-        [Required]
         [MaxLength(50)]
-        public string SubjectAnnouncementTitle { get; set;}
+        public string? SubjectAnnouncementTitle { get; set;}
         [Required]
         [MaxLength]
         public string SubjectAnnouncementContent { get; set; }

@@ -52,4 +52,10 @@ namespace LearningManagementSystem.Models.SubjectModel
         public string? SubjectDescription { get; set; }
         public UserViewModel? Lecturer { get; set; }
     }
+    public class SubjectLiteViewModel
+    {
+        public Guid SubjectId { get; set; }
+        public string? SubjectCode { get; set; }
+        public string? SubjectName { get; set; }
+    }
 }

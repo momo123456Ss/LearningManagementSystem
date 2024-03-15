@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240315062852_updatetable-usernotification-1503")]
+    partial class updatetableusernotification1503
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -750,7 +752,8 @@ namespace LearningManagementSystem.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserNotificationsContent")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("UserNotificationsId");
 

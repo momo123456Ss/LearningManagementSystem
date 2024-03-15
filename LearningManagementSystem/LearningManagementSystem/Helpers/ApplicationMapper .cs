@@ -6,6 +6,7 @@ using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Models.LessonModel;
 using LearningManagementSystem.Models.LessonResources;
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
+using LearningManagementSystem.Models.QaAFollwers;
 using LearningManagementSystem.Models.QaAModel;
 using LearningManagementSystem.Models.SAModel;
 using LearningManagementSystem.Models.SubjectModel;
@@ -13,6 +14,7 @@ using LearningManagementSystem.Models.SubjectTopicModel;
 using LearningManagementSystem.Models.UserBelongToFacultyModel;
 using LearningManagementSystem.Models.UserClassSubjectModel;
 using LearningManagementSystem.Models.UserModel;
+using LearningManagementSystem.Models.UserNotificationsModel;
 using LearningManagementSystem.Models.UserRoleModels;
 
 namespace LearningManagementSystem.Helpers
@@ -33,6 +35,9 @@ namespace LearningManagementSystem.Helpers
             CreateMap<User, UserModelUpdateRole>().ReverseMap();
             CreateMap<User, UserViewModel>()
                 .ForMember(dest => dest.UserRoleViewModel, opt => opt.MapFrom(src => src.UserRole))
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName))
+                .ReverseMap();
+            CreateMap<User, UserLiteViewModel>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FirstName + " " + src.LastName))
                 .ReverseMap();
             CreateMap<User, LeadershipModelUpdateNotificationSettings>().ReverseMap();
@@ -69,6 +74,7 @@ namespace LearningManagementSystem.Helpers
                 .ReverseMap();
             CreateMap<Subject, SubjectModelCreate>().ReverseMap();
             CreateMap<Subject, SubjectModelUpdate>().ReverseMap();
+            CreateMap<Subject, SubjectLiteViewModel>().ReverseMap();
             #endregion
 
             //OtherSubjectInformation
@@ -84,6 +90,9 @@ namespace LearningManagementSystem.Helpers
                 .ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelCreate>().ReverseMap();
             CreateMap<SubjectTopic, SubjectTopicModelUpdate>().ReverseMap();
+            CreateMap<SubjectTopic, SubjectTopicLiteViewModel>()
+                .ForMember(dest => dest.SubjectIdNavigation, opt => opt.MapFrom(src => src.SubjectIdNavigation))
+                .ReverseMap();
             #endregion
             //UserClassSubject
             #region
@@ -108,6 +117,9 @@ namespace LearningManagementSystem.Helpers
             CreateMap<Lesson, LessonModelView>().ReverseMap();
             CreateMap<Lesson, LessonModelView2>().ReverseMap();
             CreateMap<Lesson, LessonModelCreate>().ReverseMap();
+            CreateMap<Lesson, LessonLiteViewModel>()
+                .ForMember(dest => dest.SubjectTopicNavigation, opt => opt.MapFrom(src => src.SubjectTopicNavigation))
+                .ReverseMap();
             #endregion
             //LessonResources
             #region
@@ -115,8 +127,19 @@ namespace LearningManagementSystem.Helpers
                 .ForMember(dest => dest.LecturesAndResourcesNavigation, opt => opt.MapFrom(src => src.LecturesAndResourcesNavigation))
                 .ReverseMap();
             #endregion
+            //QaAFollow
+            #region
+            CreateMap<QaAFollowers, QaAFollowViewModel>()
+                .ForMember(dest => dest.UserIdFollowerNavigation, opt => opt.MapFrom(src => src.UserIdFollowerNavigation))
+                .ForMember(dest => dest.QuestionAndAnswerNavigation, opt => opt.MapFrom(src => src.QuestionAndAnswerNavigation))
+                .ReverseMap();
+            #endregion
             //QaA
             #region
+            CreateMap<QuestionAndAnswer, QaALiteViewModel>()
+                .ForMember(dest => dest.ClassModelViewNavigation, opt => opt.MapFrom(src => src.ClassNavigation))
+                .ForMember(dest => dest.LessonModelViewNavigation, opt => opt.MapFrom(src => src.LessonNavigation))
+                .ReverseMap();
             CreateMap<QuestionAndAnswer, QaAModelCreate>()
                 .ReverseMap();
             CreateMap<QuestionAndAnswer, QaAModelView>()
@@ -129,7 +152,28 @@ namespace LearningManagementSystem.Helpers
             #endregion
             //SubjectAnnouncement
             #region
+            CreateMap<SubjectAnnouncement, SubjectAnnouncementModelView>()
+                .ForMember(dest => dest.UserModelViewNavigation, opt => opt.MapFrom(src => src.UserAnnouncementNavigation))
+                .ForMember(dest => dest.ClassModelViewNavigation, opt => opt.MapFrom(src => src.ClassAnnouncementNavigation))
+                .ReverseMap();
             CreateMap<SubjectAnnouncement, SubjectAnnouncementModelCreate>().ReverseMap();
+            CreateMap<SubjectAnnouncement, SubjectAnnouncementModelCreateSingle>().ReverseMap();
+            CreateMap<SubjectAnnouncement, SubjectAnnouncementLiteViewModel>()
+                .ForMember(dest => dest.SubjectAnnouncementNavigation, opt => opt.MapFrom(src => src.SubjectAnnouncementNavigation))
+                .ForMember(dest => dest.ClassModelViewNavigation, opt => opt.MapFrom(src => src.ClassAnnouncementNavigation))
+                .ReverseMap();
+
+            #endregion
+            //UserNotificationModel
+            #region
+            CreateMap<UserNotifications, UserNotificationModelCreate>()
+                .ReverseMap();
+            CreateMap<UserNotifications, UserNotificationViewModel>()
+                .ForMember(dest => dest.UserLiteViewModel, opt => opt.MapFrom(src => src.UserNotificationsNavigation))
+                .ForMember(dest => dest.QaAFollowersNavigation, opt => opt.MapFrom(src => src.QaAFollowersNavigation))
+                .ForMember(dest => dest.SubjectAnnouncementNavigation, opt => opt.MapFrom(src => src.SubjectAnnouncementNavigation))
+                .ForMember(dest => dest.QuestionAndAnswerNavigation, opt => opt.MapFrom(src => src.QuestionAndAnswerNavigation))
+                .ReverseMap();
             #endregion
         }
     }

@@ -52,6 +52,7 @@ builder.Services.AddScoped<InterfaceLessonResourcesRepository, LessonResourcesRe
 builder.Services.AddScoped<InterfaceLessonRepository, LessonRepository>();
 builder.Services.AddScoped<InterfaceQaARepository, QaARepository>();
 builder.Services.AddScoped<InterfaceSARepository, SARepository>();
+builder.Services.AddScoped<InterfaceUNRepository, UNRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

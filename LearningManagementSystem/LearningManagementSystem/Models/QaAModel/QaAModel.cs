@@ -43,4 +43,12 @@ namespace LearningManagementSystem.Models.QaAModel
         public ClassModelView ClassModelViewNavigation { get; set; }
         public LessonModelView LessonModelViewNavigation { get; set; }
     }
+    public class QaALiteViewModel
+    {
+        public int QuestionAndAnswerId { get; set; }
+        public string QuestionAndAnswerTitle { get; set; }
+        public string QuestionAndAnswerContent { get; set; }
+        public ClassModelView ClassModelViewNavigation { get; set; }
+        public LessonLiteViewModel LessonModelViewNavigation { get; set; }
+    }
 }

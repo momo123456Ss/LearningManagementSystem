@@ -24,6 +24,7 @@ namespace LearningManagementSystem.Entity
         public DbSet<QuestionAndAnswer> QuestionAndAnswers { get; set; } = null!;
         public DbSet<QaAFollowers> QaAFollowerss { get; set; } = null!;
         public DbSet<SubjectAnnouncement> SubjectAnnouncements { get; set; } = null!;
+        public DbSet<UserNotifications> UserNotificationss { get; set; } = null!;
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)

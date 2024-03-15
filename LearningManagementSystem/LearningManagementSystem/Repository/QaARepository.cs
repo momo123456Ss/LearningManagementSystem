@@ -4,6 +4,7 @@ using LearningManagementSystem.Models.APIRespone;
 using LearningManagementSystem.Models.PaginatedList;
 using LearningManagementSystem.Models.QaAModel;
 using LearningManagementSystem.Models.SubjectModel;
+using LearningManagementSystem.Models.UserNotificationsModel;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -18,12 +19,14 @@ namespace LearningManagementSystem.Repository
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private static int PAGE_SIZE { get; set; } = 5;
+        private readonly InterfaceUNRepository _interfaceUNRepository;
 
-        public QaARepository(LearningManagementSystemContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public QaARepository(LearningManagementSystemContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor, InterfaceUNRepository interfaceUNRepository)
         {
             this._context = context;
             this._httpContextAccessor = httpContextAccessor;
             this._mapper = mapper;
+            this._interfaceUNRepository = interfaceUNRepository;
         }
         //GET
         #region
@@ -133,6 +136,15 @@ namespace LearningManagementSystem.Repository
                 var comment = await _context.QuestionAndAnswers.FindAsync(model.QaAInOtherQaA);
                 comment.NumberOfResponses += 1;
                 await _context.SaveChangesAsync();
+                var userReceivesNotification = await _context.QuestionAndAnswers.FirstOrDefaultAsync(x => x.QuestionAndAnswerId == model.QaAReplyQaA);
+                var newUN = new UserNotificationModelCreate
+                {
+                    UserNotificationsContent = $"{user.FirstName + " " + user.LastName} đã phản hồi bình luận của bạn",
+                    UserIdNotifications = userReceivesNotification.UserIdComment,
+                    QuestionAndAnswerId = model.QaAReplyQaA
+                };
+
+                await _interfaceUNRepository.CreateUN(newUN);
             }
 
 
@@ -159,6 +171,10 @@ namespace LearningManagementSystem.Repository
                 cf.QaAIdFollow == QaAId);
             if(checkFollow != null)
             {
+                var UN = await _context.UserNotificationss.FirstOrDefaultAsync(un => un.QaAFollowersId == checkFollow.QaAFollowersId);
+                _context.UserNotificationss.Remove(UN);
+                await _context.SaveChangesAsync();
+
                 _context.QaAFollowerss.Remove(checkFollow);
                 await _context.SaveChangesAsync();
                 return new APIResponse
@@ -175,6 +191,19 @@ namespace LearningManagementSystem.Repository
             };
             await _context.AddAsync(newFollower);
             await _context.SaveChangesAsync();
+
+            var follow = await _context.QaAFollowerss
+                .Include(u => u.QuestionAndAnswerNavigation)
+                .FirstOrDefaultAsync(f => f.QaAFollowersId == newFollower.QaAFollowersId);
+            var newUN = new UserNotificationModelCreate
+            {
+                UserNotificationsContent = $"{user.FirstName+ " " + user.LastName} đã theo dõi bình luận của bạn",
+                UserIdNotifications = follow.QuestionAndAnswerNavigation.UserIdComment,
+                QaAFollowersId = newFollower.QaAFollowersId
+            };
+
+            await _interfaceUNRepository.CreateUN(newUN);
+                
             return new APIResponse
             {
                 Success = true,

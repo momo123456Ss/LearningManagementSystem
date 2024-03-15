@@ -149,4 +149,10 @@ namespace LearningManagementSystem.Models.UserModel
         public UserRoleViewModel UserRoleViewModel { get; set; }
 
     }
+    public class UserLiteViewModel
+    {
+        public Guid UserId { get; set;}
+        public string FullName { get; set; }
+        public string Avatar { get; set; }
+    }
 }

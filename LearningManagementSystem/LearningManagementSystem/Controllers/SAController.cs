@@ -19,6 +19,24 @@ namespace LearningManagementSystem.Controllers
         }
         //GET
         #region
+        [HttpGet("GetSA/{subjectId}")]
+        [Authorize]
+        public async Task<IActionResult> GetSA(string subjectId, string? classId, bool isNotice, int page = 1)
+        {
+            try
+            {
+                return Ok(await _interfaceSARepository.GetSA(subjectId,classId,isNotice,page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error : {ex.Message}"
+                    });
+            }
+        }
         #endregion
         //POST
         #region
@@ -30,6 +48,24 @@ namespace LearningManagementSystem.Controllers
             {
                 return Ok(await _interfaceSARepository.CreateSA(model));
             }catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error : {ex.Message}"
+                    });
+            }
+        }
+        [HttpPost("CreateSASingle")]
+        [Authorize]
+        public async Task<IActionResult> CreateSA([FromBody] SubjectAnnouncementModelCreateSingle model)
+        {
+            try
+            {
+                return Ok(await _interfaceSARepository.CreateSA(model));
+            }
+            catch (Exception ex)
             {
                 return BadRequest(
                     new APIResponse

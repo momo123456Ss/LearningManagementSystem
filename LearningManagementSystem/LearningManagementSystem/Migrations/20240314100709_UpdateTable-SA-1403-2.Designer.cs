@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240314100709_UpdateTable-SA-1403-2")]
+    partial class UpdateTableSA14032
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -726,45 +728,6 @@ namespace LearningManagementSystem.Migrations
                     b.ToTable("UserClassSubject");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.UserNotifications", b =>
-                {
-                    b.Property<int>("UserNotificationsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserNotificationsId"), 1L, 1);
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("QaAFollowersId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("QuestionAndAnswerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SubjectAnnouncementId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserIdNotifications")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserNotificationsContent")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserNotificationsId");
-
-                    b.HasIndex("QaAFollowersId");
-
-                    b.HasIndex("QuestionAndAnswerId");
-
-                    b.HasIndex("SubjectAnnouncementId");
-
-                    b.HasIndex("UserIdNotifications");
-
-                    b.ToTable("UserNotifications");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.UserRole", b =>
                 {
                     b.Property<Guid>("RoleId")
@@ -1121,35 +1084,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectNavigation");
 
                     b.Navigation("UserNavigation");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.UserNotifications", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.QaAFollowers", "QaAFollowersNavigation")
-                        .WithMany()
-                        .HasForeignKey("QaAFollowersId");
-
-                    b.HasOne("LearningManagementSystem.Entity.QuestionAndAnswer", "QuestionAndAnswerNavigation")
-                        .WithMany()
-                        .HasForeignKey("QuestionAndAnswerId");
-
-                    b.HasOne("LearningManagementSystem.Entity.SubjectAnnouncement", "SubjectAnnouncementNavigation")
-                        .WithMany()
-                        .HasForeignKey("SubjectAnnouncementId");
-
-                    b.HasOne("LearningManagementSystem.Entity.User", "UserNotificationsNavigation")
-                        .WithMany()
-                        .HasForeignKey("UserIdNotifications")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QaAFollowersNavigation");
-
-                    b.Navigation("QuestionAndAnswerNavigation");
-
-                    b.Navigation("SubjectAnnouncementNavigation");
-
-                    b.Navigation("UserNotificationsNavigation");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.Class", b =>

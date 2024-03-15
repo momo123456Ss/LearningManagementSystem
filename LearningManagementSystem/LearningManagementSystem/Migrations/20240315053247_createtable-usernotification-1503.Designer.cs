@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240315053247_createtable-usernotification-1503")]
+    partial class createtableusernotification1503
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -734,9 +736,6 @@ namespace LearningManagementSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserNotificationsId"), 1L, 1);
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<int?>("QaAFollowersId")
                         .HasColumnType("int");
 
@@ -750,7 +749,8 @@ namespace LearningManagementSystem.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserNotificationsContent")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("UserNotificationsId");
 

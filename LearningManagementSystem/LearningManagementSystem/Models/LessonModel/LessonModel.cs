@@ -1,4 +1,6 @@
-﻿using LearningManagementSystem.Models.LessonResources;
+﻿using LearningManagementSystem.Entity;
+using LearningManagementSystem.Models.LessonResources;
+using LearningManagementSystem.Models.SubjectTopicModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.LessonModel
@@ -9,6 +11,12 @@ namespace LearningManagementSystem.Models.LessonModel
         public string? LessonTitle { get; set; }
         //public ICollection<LessonResourcesView> LessonResourcess { get; set; }
 
+    }
+    public class LessonLiteViewModel
+    {
+        public int LessonId { get; set; }
+        public string? LessonTitle { get; set; }
+        public SubjectTopicLiteViewModel SubjectTopicNavigation { get; set; }
     }
     public class LessonModelView2
     {
