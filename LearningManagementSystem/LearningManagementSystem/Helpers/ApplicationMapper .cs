@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using LearningManagementSystem.Entity;
 using LearningManagementSystem.Models.ClassModel;
+using LearningManagementSystem.Models.ExemAndTest;
 using LearningManagementSystem.Models.FacultyModel;
 using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Models.LessonModel;
@@ -174,6 +175,11 @@ namespace LearningManagementSystem.Helpers
                 .ForMember(dest => dest.SubjectAnnouncementNavigation, opt => opt.MapFrom(src => src.SubjectAnnouncementNavigation))
                 .ForMember(dest => dest.QuestionAndAnswerNavigation, opt => opt.MapFrom(src => src.QuestionAndAnswerNavigation))
                 .ReverseMap();
+            #endregion
+            //ExamAndTest
+            #region
+            CreateMap<ExamAndTest, ExamAndTestModelUploadFile>().ReverseMap();
+            CreateMap<ExamAndTest, ExamAndTestModelDowload>().ReverseMap();
             #endregion
         }
     }

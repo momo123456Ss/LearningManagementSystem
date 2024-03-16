@@ -5,14 +5,9 @@ using LearningManagementSystem.Models.APIRespone;
 using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using AutoMapper;
-using Microsoft.VisualBasic.FileIO;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using LearningManagementSystem.Models.PaginatedList;
-using LearningManagementSystem.Models.SubjectModel;
-using System.Drawing.Printing;
-using System.Globalization;
-using MimeKit;
 using System.IO.Compression;
 
 namespace LearningManagementSystem.Repository
