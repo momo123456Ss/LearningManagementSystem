@@ -191,6 +191,7 @@ namespace LearningManagementSystem.Repository
                 }
             }
             #endregion
+            question.LastModifiedDate = DateTime.Now;
             await _context.SaveChangesAsync();
 
             return new APIResponse { Success = true, Message = "Question updated successfully" };

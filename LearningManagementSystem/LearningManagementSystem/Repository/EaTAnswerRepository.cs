@@ -43,6 +43,7 @@ namespace LearningManagementSystem.Repository
                     Message = "Question not found."
                 };
             }
+            question.LastModifiedDate = DateTime.Now;
             var newAnswer = _mapper.Map<ExamAndTestAnswers>(model);
             await _context.AddAsync(newAnswer);
             await _context.SaveChangesAsync();
@@ -84,7 +85,11 @@ namespace LearningManagementSystem.Repository
                         Message = "Question not found."
                     };
                 }
+                question.LastModifiedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
             }
+            var questionUpdate = await _context.ExamAndTestQuestionss.FindAsync(answer.EaTQuestionId);
+            questionUpdate.LastModifiedDate = DateTime.Now;
             #region
             foreach (var property in typeof(ExamAndTestAnswerAddOrUpdateModel).GetProperties())
             {
@@ -115,6 +120,8 @@ namespace LearningManagementSystem.Repository
                 };
             }
             var answer = await _context.ExamAndTestAnswerss.FindAsync(int.Parse(answerId));
+            var question = await _context.ExamAndTestQuestionss.FindAsync(answer.EaTQuestionId);
+            question.LastModifiedDate = DateTime.Now;
             if (answer == null)
             {
                 return new APIResponse
