@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240318082922_CreateTable-ExamQuestion_Answer-1803")]
+    partial class CreateTableExamQuestion_Answer1803
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,32 +170,23 @@ namespace LearningManagementSystem.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("EaTQuestionId")
-                        .HasColumnType("int");
+                    b.Property<string>("ExamAndTestQuestionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("isAnswer")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EaTQuestionId");
+                    b.HasIndex("ExamAndTestQuestionId");
 
                     b.ToTable("ExamAndTestAnswers");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.ExamAndTestQuestions", b =>
                 {
-                    b.Property<int>("EaTQuestionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EaTQuestionId"), 1L, 1);
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ExamAndTestQuestionCode")
-                        .IsRequired()
+                    b.Property<string>("ExamAndTestQuestionId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -201,11 +194,6 @@ namespace LearningManagementSystem.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("ExamAndTestQuestionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("FacultyId")
                         .HasColumnType("uniqueidentifier");
@@ -215,16 +203,13 @@ namespace LearningManagementSystem.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Tier")
                         .HasColumnType("int");
 
-                    b.HasKey("EaTQuestionId");
+                    b.HasKey("ExamAndTestQuestionId");
 
                     b.HasIndex("FacultyId");
 
@@ -1049,7 +1034,7 @@ namespace LearningManagementSystem.Migrations
                 {
                     b.HasOne("LearningManagementSystem.Entity.ExamAndTestQuestions", "ExamAndTestQuestionsNavigation")
                         .WithMany("ExamAndTestAnswerss")
-                        .HasForeignKey("EaTQuestionId")
+                        .HasForeignKey("ExamAndTestQuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

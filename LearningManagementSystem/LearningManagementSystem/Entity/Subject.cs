@@ -17,7 +17,7 @@ namespace LearningManagementSystem.Entity
             UserClassSubjects = new HashSet<UserClassSubject>();
             LecturesAndResourcesL = new HashSet<LecturesAndResources>();
             ExamAndTests = new HashSet<ExamAndTest>();
-
+            ExamAndTestQuestionss = new HashSet<ExamAndTestQuestions>();
         }
         [Key]
         public Guid SubjectId {get; set;}
@@ -49,6 +49,8 @@ namespace LearningManagementSystem.Entity
         public ICollection<LecturesAndResources> LecturesAndResourcesL { get; set; }
         [JsonIgnore]
         public ICollection<ExamAndTest> ExamAndTests { get; set; }
+        [JsonIgnore]
+        public ICollection<ExamAndTestQuestions> ExamAndTestQuestionss { get; set; }
         #endregion
     }
 }

@@ -4,6 +4,7 @@ using LearningManagementSystem.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LearningManagementSystem.Migrations
 {
     [DbContext(typeof(LearningManagementSystemContext))]
-    partial class LearningManagementSystemContextModelSnapshot : ModelSnapshot
+    [Migration("20240318091909_editTable-EaT-1803-4")]
+    partial class editTableEaT18034
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,15 +170,10 @@ namespace LearningManagementSystem.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("EaTQuestionId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("isAnswer")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EaTQuestionId");
 
                     b.ToTable("ExamAndTestAnswers");
                 });
@@ -188,9 +185,6 @@ namespace LearningManagementSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EaTQuestionId"), 1L, 1);
-
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ExamAndTestQuestionCode")
                         .IsRequired()
@@ -214,9 +208,6 @@ namespace LearningManagementSystem.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("LastModifiedDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
@@ -1045,17 +1036,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectNavigation");
                 });
 
-            modelBuilder.Entity("LearningManagementSystem.Entity.ExamAndTestAnswers", b =>
-                {
-                    b.HasOne("LearningManagementSystem.Entity.ExamAndTestQuestions", "ExamAndTestQuestionsNavigation")
-                        .WithMany("ExamAndTestAnswerss")
-                        .HasForeignKey("EaTQuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ExamAndTestQuestionsNavigation");
-                });
-
             modelBuilder.Entity("LearningManagementSystem.Entity.ExamAndTestQuestions", b =>
                 {
                     b.HasOne("LearningManagementSystem.Entity.Faculty", "FacultyNavigation")
@@ -1353,11 +1333,6 @@ namespace LearningManagementSystem.Migrations
                     b.Navigation("SubjectAnnouncements");
 
                     b.Navigation("UserClassSubjects");
-                });
-
-            modelBuilder.Entity("LearningManagementSystem.Entity.ExamAndTestQuestions", b =>
-                {
-                    b.Navigation("ExamAndTestAnswerss");
                 });
 
             modelBuilder.Entity("LearningManagementSystem.Entity.Faculty", b =>

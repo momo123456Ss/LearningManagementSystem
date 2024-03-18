@@ -26,12 +26,16 @@ namespace LearningManagementSystem.Entity
         public DbSet<SubjectAnnouncement> SubjectAnnouncements { get; set; } = null!;
         public DbSet<UserNotifications> UserNotificationss { get; set; } = null!;
         public DbSet<ExamAndTest> ExamAndTestS { get; set; } = null!;
+        public DbSet<ExamAndTestQuestions> ExamAndTestQuestionss { get; set; } = null!;
+        public DbSet<ExamAndTestAnswers> ExamAndTestAnswerss { get; set; } = null!;
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserClassSubject>()
                 .HasKey(ucs => new { ucs.UserId, ucs.ClassId, ucs.SubjectId });
+            modelBuilder.Entity<ExamAndTestQuestions>()
+                .HasKey(eat => new { eat.EaTQuestionId });
             modelBuilder.Entity<LessonResources>()
                 .HasOne(l => l.LessonNavigation)
                 .WithMany(lr => lr.LessonResourcess)

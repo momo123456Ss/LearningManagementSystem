@@ -13,6 +13,7 @@ namespace LearningManagementSystem.Entity
             UserBelongToFacultys = new HashSet<UserBelongToFaculty>();
             Classes = new HashSet<Class>(); 
             ExamAndTests = new HashSet<ExamAndTest>();
+            ExamAndTestQuestionss = new HashSet<ExamAndTestQuestions>();
         }
         //Thông tin Faculty
         [Key]
@@ -48,6 +49,8 @@ namespace LearningManagementSystem.Entity
         public ICollection<Class> Classes { get; set; }
         [JsonIgnore]
         public ICollection<ExamAndTest> ExamAndTests { get; set; }
+        [JsonIgnore]
+        public ICollection<ExamAndTestQuestions> ExamAndTestQuestionss { get; set; }
         #endregion
     }
 }

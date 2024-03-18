@@ -54,6 +54,8 @@ builder.Services.AddScoped<InterfaceQaARepository, QaARepository>();
 builder.Services.AddScoped<InterfaceSARepository, SARepository>();
 builder.Services.AddScoped<InterfaceUNRepository, UNRepository>();
 builder.Services.AddScoped<InterfaceExamAndTest, ExamAndTestRepository>();
+builder.Services.AddScoped<InterfaceEaTQuestionRepository, EaTQuestionRepository>();
+builder.Services.AddScoped<InterfaceEaTAnswerRepository, EaTAnswerRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
