@@ -58,6 +58,7 @@ namespace LearningManagementSystem.Helpers
             CreateMap<Faculty, FacultyModelView>().ReverseMap();
             CreateMap<Faculty, FacultyModelCreate>().ReverseMap();
             CreateMap<Faculty, FacultyModelUpdate>().ReverseMap();
+            CreateMap<Faculty, FacultyLiteViewModel>().ReverseMap();
             #endregion
             //UserBelongToFaculty
             #region
@@ -180,6 +181,10 @@ namespace LearningManagementSystem.Helpers
             #region
             CreateMap<ExamAndTest, ExamAndTestModelUploadFile>().ReverseMap();
             CreateMap<ExamAndTest, ExamAndTestModelDowload>().ReverseMap();
+            CreateMap<ExamAndTest, ExamAndTestViewModel>()
+                .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
+                .ForMember(dest => dest.FacultyNavigation, opt => opt.MapFrom(src => src.FacultyNavigation))
+                .ReverseMap();
             #endregion
         }
     }

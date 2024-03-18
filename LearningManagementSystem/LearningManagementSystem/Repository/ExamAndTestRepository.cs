@@ -4,8 +4,11 @@ using CloudinaryDotNet.Actions;
 using LearningManagementSystem.Entity;
 using LearningManagementSystem.Models.APIRespone;
 using LearningManagementSystem.Models.ExemAndTest;
+using LearningManagementSystem.Models.PaginatedList;
+using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Repository.InterfaceRepository;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing.Printing;
 using System.Security.Claims;
 
 namespace LearningManagementSystem.Repository
@@ -17,6 +20,8 @@ namespace LearningManagementSystem.Repository
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHttpClientFactory _clientFactory;
+        private static int PAGE_SIZE { get; set; } = 5;
+
         public ExamAndTestRepository(LearningManagementSystemContext context, Cloudinary cloudinary, IMapper mapper, IHttpContextAccessor httpContextAccessor, IHttpClientFactory clientFactory)
         {
             _context = context;
@@ -93,6 +98,123 @@ namespace LearningManagementSystem.Repository
                 // Ném ngoại lệ nếu yêu cầu không thành công
                 throw new HttpRequestException($"Error downloading file from Cloudinary: {response.StatusCode}");
             }
+        }
+
+        public async Task<APIResponse> GetExamAndTestForTeacher(string searchString, string facultyId, string subjectId, int page = 1)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                         .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            if (!user.UserRole.ExamsAndTestsSee)
+            {
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Teacher not have permission to see.",
+                };
+            }
+            var allExamAndTest = _context.ExamAndTestS
+                .Include(s => s.SubjectNavigation)
+                .Include(f => f.FacultyNavigation)
+                .Where(eat => eat.SubjectNavigation.LecturerId.Equals(user.UserId))
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                allExamAndTest = allExamAndTest.Where(f =>
+                    f.FileName.ToLower().Contains(searchString) ||
+                    f.ExamForm.ToLower().Contains(searchString) ||
+                    f.Status.ToLower().Contains(searchString)
+                );
+            }
+            if (!string.IsNullOrEmpty(facultyId))
+            {
+                allExamAndTest = allExamAndTest.Where(f => f.FacultyId.Equals(Guid.Parse(facultyId)));
+            }
+            if (!string.IsNullOrEmpty(subjectId))
+            {
+                allExamAndTest = allExamAndTest.Where(f => f.SubjectId.Equals(Guid.Parse(subjectId)));
+            }
+            allExamAndTest = allExamAndTest.OrderBy(a => a.CreatedDate);
+
+            if (page < 1)
+            {
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Had found.",
+                    Data = _mapper.Map<List<ExamAndTestViewModel>>(allExamAndTest)
+                };
+            }
+            var result = PaginatedList<ExamAndTest>.Create(allExamAndTest, page, PAGE_SIZE);
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Had found.",
+                Data = _mapper.Map<List<ExamAndTestViewModel>>(result)
+            };
+        }
+        public async Task<APIResponse> GetExamAndTestForAdmin(string searchString, string subjectId, string teacherId, string status, int page = 1)
+        {
+            var user = await _context.Users.Include(role => role.UserRole)
+                         .FirstOrDefaultAsync(u => u.Email == _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email));
+            if (!user.UserRole.ExamsAndTestsSee)
+            {
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Admin not have permission to see.",
+                };
+            }
+            var allExamAndTest = _context.ExamAndTestS
+                .Include(s => s.SubjectNavigation)
+                    .ThenInclude(u => u.UserNavigation)
+                .Include(f => f.FacultyNavigation)
+                .Where(a => a.Status.Equals("Chờ phê duyệt"))
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                searchString = searchString.ToLower();
+                allExamAndTest = allExamAndTest.Where(f =>
+                    f.FileName.ToLower().Contains(searchString) ||
+                    f.ExamForm.ToLower().Contains(searchString) ||
+                    f.Status.ToLower().Contains(searchString) ||
+                    String.Concat(f.SubjectNavigation.UserNavigation.FirstName + " " + f.SubjectNavigation.UserNavigation.LastName).Contains(searchString)
+                );
+            }
+            if (!string.IsNullOrEmpty(status))
+            {
+                status = status.ToLower();
+                allExamAndTest = allExamAndTest.Where(f => f.Status.ToLower().Contains(status));
+                    
+            }
+            if (!string.IsNullOrEmpty(subjectId))
+            {
+                allExamAndTest = allExamAndTest.Where(f => f.SubjectId.Equals(Guid.Parse(subjectId)));
+            }
+            if (!string.IsNullOrEmpty(teacherId))
+            {
+                allExamAndTest = allExamAndTest.Where(f => f.SubjectNavigation.LecturerId.Equals(Guid.Parse(teacherId)));
+            }
+            allExamAndTest = allExamAndTest.OrderBy(a => a.CreatedDate);
+
+            if (page < 1)
+            {
+                return new APIResponse
+                {
+                    Success = true,
+                    Message = "Had found.",
+                    Data = _mapper.Map<List<ExamAndTestViewModel>>(allExamAndTest)
+                };
+            }
+            var result = PaginatedList<ExamAndTest>.Create(allExamAndTest, page, PAGE_SIZE);
+            return new APIResponse
+            {
+                Success = true,
+                Message = "Had found.",
+                Data = _mapper.Map<List<ExamAndTestViewModel>>(result)
+            };
         }
         #endregion
         //POST
@@ -413,10 +535,12 @@ namespace LearningManagementSystem.Repository
                 else
                 {
                     return new APIResponse { Success = false, Message = "Deleting current file failed" };
-                }               
+                }
             }
             return new APIResponse { Success = true, Message = "Something Error" };
         }
+
+
         #endregion
     }
 }

@@ -40,6 +40,42 @@ namespace LearningManagementSystem.Controllers
         }
         //GET
         #region
+        [HttpGet("GetExamAndTestForTeacher")]
+        [Authorize(Policy = "RequireTeacher")]
+        public async Task<IActionResult> GetExamAndTestForTeacher(string? searchString, string? facultyId, string? subjectId, int page = 1)
+        {
+            try
+            {
+                return Ok(await _interfaceExamAndTest.GetExamAndTestForTeacher(searchString,facultyId,subjectId,page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error GetExamAndTestForTeacher: {ex.Message}"
+                    });
+            }
+        }
+        [HttpGet("GetExamAndTestForAdmin")]
+        [Authorize(Policy = "RequireAdministrator")]
+        public async Task<IActionResult> GetExamAndTestForAdmin(string? searchString, string? subjectId, string? teacherId, string? status, int page = 1)
+        {
+            try
+            {
+                return Ok(await _interfaceExamAndTest.GetExamAndTestForAdmin(searchString, subjectId, teacherId,status, page));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(
+                    new APIResponse
+                    {
+                        Success = false,
+                        Message = $"Error GetExamAndTestForAdmin: {ex.Message}"
+                    });
+            }
+        }
         [HttpGet("DowloadExamAndTestFile/{id}")]
         public async Task<IActionResult> DowloadExamAndTestFile(string id)
         {

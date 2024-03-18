@@ -42,4 +42,10 @@ namespace LearningManagementSystem.Models.FacultyModel
         public int? NumberOfStudents { get; set; }
         public int? NumberOfTeacher { get; set; }
     }
+    public class FacultyLiteViewModel
+    {
+        public Guid? FacultyId { get; set; }
+        public string? FacultyCode { get; set; }
+        public string? FacultyName { get; set; }
+    }
 }

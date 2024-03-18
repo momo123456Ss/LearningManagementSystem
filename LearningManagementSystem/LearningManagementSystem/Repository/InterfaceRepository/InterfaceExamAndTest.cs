@@ -8,6 +8,9 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
     {
         //GET
         #region
+        Task<APIResponse> GetExamAndTestForTeacher(string searchString, string facultyId, string subjectId, int page = 1);
+        Task<APIResponse> GetExamAndTestForAdmin(string searchString, string subjectId
+                                            ,string teacherId,string status ,int page = 1);
         Task<APIResponse> GetFileById(int fileId);
         Task<byte[]> DowloadExamAndTestFile(string fileUrl);
         #endregion
