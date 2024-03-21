@@ -192,11 +192,19 @@ namespace LearningManagementSystem.Helpers
             #region
             CreateMap<ExamAndTestQuestions, ExamAndTestQuestionCreateModel>().ReverseMap();
             CreateMap<ExamAndTestQuestions, ExamAndTestQuestionUpdateModel>().ReverseMap();
-
+            CreateMap<ExamAndTestQuestions, ExamAndTestQuestionViewModel>()
+                .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
+                .ForMember(dest => dest.FacultyNavigation, opt => opt.MapFrom(src => src.FacultyNavigation))
+                .ReverseMap();
+            CreateMap<ExamAndTestQuestions, ExamAndTestQuestion1ViewModel>()
+                .ForMember(dest => dest.ExamAndTestAnswerss, opt => opt.MapFrom(src => src.ExamAndTestAnswerss))
+                .ReverseMap();
             #endregion
             //EaTAnswer
             #region
             CreateMap<ExamAndTestAnswers, ExamAndTestAnswerAddOrUpdateModel>().ReverseMap();
+            CreateMap<ExamAndTestAnswers, ExamAndTestAnswerViewModel>().ReverseMap();
+
             #endregion
         }
     }

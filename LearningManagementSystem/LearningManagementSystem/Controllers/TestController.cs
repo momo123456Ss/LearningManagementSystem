@@ -1,8 +1,19 @@
-﻿using CloudinaryDotNet;
+﻿using AutoMapper;
+using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Http;
+using LearningManagementSystem.Entity;
+using LearningManagementSystem.Models.ExamAndTestQuestionModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml;
+
+using Newtonsoft.Json;
+using System.Text;
+using System.Xml;
+using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
+using CloudinaryDotNet.Core;
 
 namespace LearningManagementSystem.Controllers
 {
@@ -12,11 +23,135 @@ namespace LearningManagementSystem.Controllers
     {
         private readonly Cloudinary _cloudinary;
         private readonly IWebHostEnvironment _environment;
+        private readonly LearningManagementSystemContext _context;
+        private readonly IMapper _mapper;
+        private readonly string _templatePath = @"E:\.NET CORE API\LearningManagementSystem\LearningManagementSystem\LearningManagementSystem\Uploads\Files\Template\mau-de-thi-trac-nghiem-v2.docx";
 
-        public TestController(Cloudinary cloudinary, IWebHostEnvironment environment)
+        public TestController(Cloudinary cloudinary, IWebHostEnvironment environment, LearningManagementSystemContext context, IMapper mapper)
         {
             _cloudinary = cloudinary;
             _environment = environment;
+            _context = context;
+            _mapper = mapper;
+        }
+        private string SanitizeXmlString(string xmlString)
+        {
+            // Loại bỏ các ký tự không hợp lệ từ chuỗi XML
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in xmlString)
+            {
+                if (XmlConvert.IsXmlChar(c))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
+
+        private void GenerateWordFromTemplate(List<ExamAndTestQuestion1ViewModel> questions, string outputPath)
+        {
+
+            using (WordprocessingDocument doc = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Document))
+            {
+
+                // Tạo body cho tài liệu
+                doc.AddMainDocumentPart();
+                doc.MainDocumentPart.Document = new Document();
+                Body body = doc.MainDocumentPart.Document.AppendChild(new Body());
+
+                // Đọc template và thay thế dữ liệu
+                #region
+                using (var templateStream = System.IO.File.OpenRead(_templatePath))
+                {
+                    body.InnerXml = new StreamReader(templateStream).ReadToEnd();
+
+                    var danhSachCauHoiContentControl = body.Descendants<SdtElement>().FirstOrDefault(sdt => sdt.SdtProperties.GetFirstChild<Tag>().Val == "danh_sach_cau_hoi");
+                    if (danhSachCauHoiContentControl != null)
+                    {
+                        var danhSachCauHoiContent = danhSachCauHoiContentControl.SdtProperties;
+                        foreach (var question in questions)
+                        {
+                            string sanitizedQuestion = question.ExamAndTestQuestionContent;
+                            Paragraph questionParagraph = new Paragraph(new Run(new Text(sanitizedQuestion)));
+                            danhSachCauHoiContent.AppendChild(questionParagraph);
+
+                            foreach (var answer in question.ExamAndTestAnswerss)
+                            {
+                                string sanitizedAnswer = answer.AnswerContent;
+                                Paragraph answerParagraph = new Paragraph(new Run(new Text(sanitizedAnswer)));
+                                danhSachCauHoiContent.AppendChild(answerParagraph);
+                            }
+                        }
+                    }
+                }
+                #endregion
+                #region
+                //var templateStream = System.IO.File.OpenRead(_templatePath);
+                //body.InnerXml = new StreamReader(templateStream).ReadToEnd();
+
+                //var danhSachCauHoiContentControl = body.Descendants<SdtElement>().FirstOrDefault(sdt => sdt.SdtProperties.GetFirstChild<Tag>().Val == "[danh_sach_cau_hoi]");
+                //if (danhSachCauHoiContentControl != null)
+                //{
+                //    var danhSachCauHoiContent = danhSachCauHoiContentControl.SdtProperties;
+                //    foreach (var question in questions)
+                //    {
+                //        string sanitizedQuestion = question.ExamAndTestQuestionContent;
+                //        Paragraph questionParagraph = new Paragraph(new Run(new Text(sanitizedQuestion)));
+                //        danhSachCauHoiContent.AppendChild(questionParagraph);
+
+                //        foreach (var answer in question.ExamAndTestAnswerss)
+                //        {
+                //            string sanitizedAnswer = answer.AnswerContent;
+                //            Paragraph answerParagraph = new Paragraph(new Run(new Text(sanitizedAnswer)));
+                //            danhSachCauHoiContent.AppendChild(answerParagraph);
+                //        }
+                //    }
+                //}
+
+                //templateStream.Close();
+                #endregion
+
+                doc.Dispose();
+            }
+
+        }
+        [HttpGet("CreateTest/{facultyId}/subject/{subjectId}")]
+        public IActionResult CreateTest(string facultyId, string subjectId)
+        {
+            try
+            {
+                var faculty = _context.Facultys.Find(Guid.Parse(facultyId));
+                var subject = _context.Subjects.Find(Guid.Parse(subjectId));
+                var question = _context.ExamAndTestQuestionss
+                    .Include(a => a.ExamAndTestAnswerss)
+                    .Where(f => f.FacultyId.Equals(faculty.FacultyId))
+                    .Where(f => f.SubjectId.Equals(subject.SubjectId))
+                    .ToList();
+                // Đảo ngẫu nhiên thứ tự của danh sách câu hỏi
+                var random = new Random();
+                var randomizedQuestions = question.OrderBy(x => random.Next()).ToList();
+                // Lấy 10 câu hỏi đầu tiên
+                var selectedQuestions = randomizedQuestions.Take(10).ToList();
+                string jsonData = JsonConvert.SerializeObject(_mapper.Map<List<ExamAndTestQuestion1ViewModel>>(selectedQuestions));
+                var data = JsonConvert.DeserializeObject<List<ExamAndTestQuestion1ViewModel>>(jsonData);
+
+                string outputPath = @"E:\.NET CORE API\LearningManagementSystem\LearningManagementSystem\LearningManagementSystem\Uploads\Files\Template\Output\output_path_for_generated_file.docx";
+                GenerateWordFromTemplate(data, outputPath);
+                return PhysicalFile(outputPath, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "exam.docx");
+
+                // Đảm bảo tệp đã được đóng trước khi đọc nó
+                //byte[] fileBytes;
+                //using (FileStream fileStream = System.IO.File.Open(outputPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                //{
+                //    fileBytes = new byte[fileStream.Length];
+                //    fileStream.Read(fileBytes, 0, (int)fileStream.Length);
+                //    return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "exam.docx");
+                //}
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, ex.Message);
+            }
         }
 
         [HttpPost("upload")]

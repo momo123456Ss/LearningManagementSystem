@@ -41,7 +41,6 @@ namespace LearningManagementSystem.Entity
         [ForeignKey("FacultyId")]
         public Faculty FacultyNavigation { get; set; }
         //one-to-many
-        [JsonIgnore]
         public ICollection<ExamAndTestAnswers> ExamAndTestAnswerss { get; set; }
     }
 }

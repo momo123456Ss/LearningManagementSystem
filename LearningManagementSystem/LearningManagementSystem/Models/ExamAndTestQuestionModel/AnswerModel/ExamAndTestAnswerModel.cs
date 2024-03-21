@@ -18,4 +18,12 @@ namespace LearningManagementSystem.Models.ExamAndTestQuestionModel.AnswerModel
         public int? EaTQuestionId { get; set; }
 
     }
+    public class ExamAndTestAnswerViewModel
+    {
+        public int Id { get; set; }
+        public string AnswerContent { get; set; }
+        public bool isAnswer { get; set; }
+
+    }
+
 }

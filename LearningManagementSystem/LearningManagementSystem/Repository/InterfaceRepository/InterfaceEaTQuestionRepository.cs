@@ -7,9 +7,14 @@ namespace LearningManagementSystem.Repository.InterfaceRepository
     {
         //GET
         #region
+        Task<ExamAndTestQuestion1ViewModel> GetById(string id);
+        Task<List<ExamAndTestQuestionViewModel>> GetAll(string? searchString, string? facultyId, string? subjectId, int? tier, int page = 1);
         #endregion
         //POST
         #region
+        Task<APIResponse> GenerateExamExcel(string tendethi,string facultyId, string subjectId, string hinhthuc, string thoigianthi, int easy, int normal, int difficult);
+
+        Task<byte[]> GenerateExamDocument(string facultyId, string subjectId,string made , string hinhthuc, string thoigianthi, int easy, int normal, int difficult);
         Task<APIResponse> CreateQuestion(ExamAndTestQuestionCreateModel model);
         Task<APIResponse> CreateQuestions(List<ExamAndTestQuestionCreateModel> models);
 

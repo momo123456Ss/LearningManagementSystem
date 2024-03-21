@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace LearningManagementSystem.Entity
 {
@@ -17,7 +18,9 @@ namespace LearningManagementSystem.Entity
 
         //Khóa ngoại
         //many-to-one
+        [JsonIgnore]
         public int EaTQuestionId { get; set; }
+        [JsonIgnore]
         [ForeignKey("EaTQuestionId")]
         public ExamAndTestQuestions ExamAndTestQuestionsNavigation { get; set; }
     }
