@@ -56,6 +56,7 @@ builder.Services.AddScoped<InterfaceUNRepository, UNRepository>();
 builder.Services.AddScoped<InterfaceExamAndTest, ExamAndTestRepository>();
 builder.Services.AddScoped<InterfaceEaTQuestionRepository, EaTQuestionRepository>();
 builder.Services.AddScoped<InterfaceEaTAnswerRepository, EaTAnswerRepository>();
+builder.Services.AddScoped<InterfaceLearningStatisticsRepository, LearningStatisticsRepository>();
 
 builder.Services.AddAuthentication(options =>
 {

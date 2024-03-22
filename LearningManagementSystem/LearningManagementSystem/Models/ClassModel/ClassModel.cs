@@ -3,6 +3,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LearningManagementSystem.Models.ClassModel
 {
+    public class ClassLiteViewModel
+    {
+        public Guid ClassId { get; set; }
+        public string? ClassCode { get; set; }
+        public string? ClassName { get; set; }
+        public string? Semester { get; set; }
+        public string? AcademicYear { get; set; }     
+        public FacultyLiteViewModel? FacultyNavigation { get; set; }
+    }
     public class ClassModelView
     {
         public Guid ClassId { get; set; }

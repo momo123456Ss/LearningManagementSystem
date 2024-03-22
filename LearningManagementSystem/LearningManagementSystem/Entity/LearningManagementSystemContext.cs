@@ -28,6 +28,7 @@ namespace LearningManagementSystem.Entity
         public DbSet<ExamAndTest> ExamAndTestS { get; set; } = null!;
         public DbSet<ExamAndTestQuestions> ExamAndTestQuestionss { get; set; } = null!;
         public DbSet<ExamAndTestAnswers> ExamAndTestAnswerss { get; set; } = null!;
+        public DbSet<LearningStatistics> LearningStatisticss { get; set; } = null!;
 
         #endregion
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -5,6 +5,7 @@ using LearningManagementSystem.Models.ExamAndTestQuestionModel;
 using LearningManagementSystem.Models.ExamAndTestQuestionModel.AnswerModel;
 using LearningManagementSystem.Models.ExemAndTest;
 using LearningManagementSystem.Models.FacultyModel;
+using LearningManagementSystem.Models.LearningStatisticsModel;
 using LearningManagementSystem.Models.LecturesAndResourcesModel;
 using LearningManagementSystem.Models.LessonModel;
 using LearningManagementSystem.Models.LessonResources;
@@ -49,6 +50,9 @@ namespace LearningManagementSystem.Helpers
             #endregion
             //Class
             #region
+            CreateMap<Class, ClassLiteViewModel>()
+                .ForMember(dest => dest.FacultyNavigation, opt => opt.MapFrom(src => src.FacultyNavigation))
+                .ReverseMap();
             CreateMap<Class, ClassModelView>()
                 .ForMember(dest => dest.FacultyModelViewNavigation, opt => opt.MapFrom(src => src.FacultyNavigation))
                 .ReverseMap();
@@ -204,7 +208,14 @@ namespace LearningManagementSystem.Helpers
             #region
             CreateMap<ExamAndTestAnswers, ExamAndTestAnswerAddOrUpdateModel>().ReverseMap();
             CreateMap<ExamAndTestAnswers, ExamAndTestAnswerViewModel>().ReverseMap();
-
+            #endregion
+            //LearningStatistics
+            #region
+            CreateMap<LearningStatistics, LearningStatisticsModelCreate>().ReverseMap();
+            CreateMap<LearningStatistics, LearningStatisticsViewModel>()
+                .ForMember(dest => dest.SubjectNavigation, opt => opt.MapFrom(src => src.SubjectNavigation))
+                .ForMember(dest => dest.ClassNavigation, opt => opt.MapFrom(src => src.ClassNavigation))
+                .ReverseMap();
             #endregion
         }
     }
