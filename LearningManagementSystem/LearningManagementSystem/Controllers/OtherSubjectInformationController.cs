@@ -2,6 +2,7 @@
 using LearningManagementSystem.Models.OtherSubjectInformationModel;
 using LearningManagementSystem.Models.SubjectModel;
 using LearningManagementSystem.Repository.InterfaceRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("OtherSubjectInformationCreate")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> OtherSubjectInformationCreate([FromBody] OtherSubjectInformationModelCreate model)
         {
             try
@@ -38,6 +40,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("UpdateOtherSubjectInformation/{id}")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> UpdateOtherSubjectInformation(string id, [FromBody] OtherSubjectInformationModelUpdate model)
         {
             try

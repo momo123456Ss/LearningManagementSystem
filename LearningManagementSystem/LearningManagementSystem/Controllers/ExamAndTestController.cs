@@ -77,6 +77,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpGet("DowloadExamAndTestFile/{id}")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> DowloadExamAndTestFile(string id)
         {
             try
@@ -95,7 +96,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("UploadExamAndTestFileEassy")]
-        [Authorize]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> UploadExamAndTestFileEassy([FromForm] ExamAndTestModelUploadFile model)
         {
             try
@@ -113,7 +114,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPost("UploadExamAndTestFileMultipleChoice")]
-        [Authorize]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> UploadExamAndTestFileMultipleChoice([FromForm] ExamAndTestModelUploadFile model)
         {
             try
@@ -185,7 +186,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPut("SendApproveExamAndTestFile/{fileId}")]
-        [Authorize(Policy = "RequireAdministratorAndTeacher")]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> SendApproveExamAndTestFile(string fileId)
         {
             try

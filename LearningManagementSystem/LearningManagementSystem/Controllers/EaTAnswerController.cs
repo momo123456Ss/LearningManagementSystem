@@ -60,7 +60,7 @@ namespace LearningManagementSystem.Controllers
         //DELETE
         #region
         [HttpDelete("DeleteAnswer/{answerId}")]
-        [Authorize]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> DeleteAnswer(string answerId)
         {
             try

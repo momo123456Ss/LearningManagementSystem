@@ -22,6 +22,7 @@ namespace LearningManagementSystem.Controllers
         //GET
         #region
         [HttpGet("ExamExcelGenerate")]
+        [Authorize (Policy = "RequireTeacher")]
         public async Task<IActionResult> GenerateExamExcel(string tendethi, string facultyId, string subjectId, string hinhthuc, string thoigianthi, int easy, int normal, int difficult)
         {
             try
@@ -33,7 +34,8 @@ namespace LearningManagementSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("ExamGenerate")]
+        [HttpGet("ExamWordGenerate")]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> GenerateExamDocument(string tendethi,string facultyId, string subjectId, string made, string hinhthuc, string thoigianthi, int easy, int normal, int difficult)
         {
             
@@ -119,7 +121,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("UpdateQuestion/{questionId}")]
-        [Authorize]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> UpdateQuestion(string questionId,[FromBody] ExamAndTestQuestionUpdateModel model)
         {
             try
@@ -139,7 +141,7 @@ namespace LearningManagementSystem.Controllers
         //DELETE
         #region
         [HttpDelete("DeleteQuestion/{questionId}")]
-        [Authorize]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> DeleteQuestion(string questionId)
         {
             try

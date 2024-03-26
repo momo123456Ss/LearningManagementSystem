@@ -50,6 +50,7 @@ namespace LearningManagementSystem.Controllers
         //GET
         #region       
         [HttpGet("DowloadLecturesOrResources/{id}")]
+        [Authorize]
         public async Task<IActionResult> DowloadLecturesOrResources(string id)
         {
             try
@@ -135,7 +136,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPost("UploadLectureFile")]
-        [Authorize]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> UploadLectureFile([FromForm] LecturesAndResourcesModelCreate model)
         {
             try
@@ -153,7 +154,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPost("UploadResoucerFile")]
-        [Authorize]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> UploadResoucerFile([FromForm] LecturesAndResourcesModelCreate model)
         {
             try

@@ -128,6 +128,7 @@ namespace LearningManagementSystem.Repository
             var allQuestion = _context.ExamAndTestQuestionss
                 .Include(s => s.SubjectNavigation).ThenInclude(u => u.UserNavigation)
                 .Include(f => f.FacultyNavigation)
+                .Where(e => e.SubjectNavigation.LecturerId.Equals(user.UserId))
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))

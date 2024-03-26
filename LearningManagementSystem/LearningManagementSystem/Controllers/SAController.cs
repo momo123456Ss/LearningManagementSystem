@@ -57,7 +57,7 @@ namespace LearningManagementSystem.Controllers
                     });
             }
         }
-        [HttpPost("CreateSASingle")]
+        [HttpPost("CreateSAComment")]
         [Authorize]
         public async Task<IActionResult> CreateSA([FromBody] SubjectAnnouncementModelCreateSingle model)
         {

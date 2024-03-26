@@ -24,7 +24,7 @@ namespace LearningManagementSystem.Controllers
         #region
         [HttpGet("GetObjectByLessonId/{lessonId}")]
         [Authorize(Policy = "RequireAdministratorAndTeacher")]
-        public async Task<IActionResult> GetObjectByLessonIdAndClassId(string lessonId)
+        public async Task<IActionResult> GetObjectByLessonId(string lessonId)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace LearningManagementSystem.Controllers
                 });
             }
         }
-        [HttpGet("GetAllFileBySubjectTopIcId/{subjectTopicId}/class{classId}")]
+        [HttpGet("GetAllFileBySubjectTopIcId/{subjectTopicId}/class/{classId}")]
         [Authorize]
         public async Task<IActionResult> GetAllFileBySubjectTopIcId(int subjectTopicId, string classId)
         {
@@ -78,7 +78,8 @@ namespace LearningManagementSystem.Controllers
         #endregion
         //POST
         #region
-        [HttpPost("CreateNewLecturesAndAddFileToLecture")]
+        [HttpPost("CreateNewLessonAndAddLectureToClasses")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> CreateNewLecturesAndAddFileToLecture([FromBody] LessonLectureModelCreate model)
         {
             try
@@ -94,7 +95,8 @@ namespace LearningManagementSystem.Controllers
                 });
             }
         }
-        [HttpPost("AddResourcesToLecture")]
+        [HttpPost("AddResourcesToClasses")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> AddResourcesToLecture([FromBody] LessonResourcesModelCreate model)
         {
             try
@@ -110,7 +112,8 @@ namespace LearningManagementSystem.Controllers
                 });
             }
         }
-        [HttpPost("AddLectureAndFileToClasses")]
+        [HttpPost("AddLectureToClasses")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> AddLectureAndFileToClasses([FromBody] LessonResourcesModelCreate model)
         {
             try

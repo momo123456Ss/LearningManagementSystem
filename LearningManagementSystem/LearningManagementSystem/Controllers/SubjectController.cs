@@ -20,6 +20,7 @@ namespace LearningManagementSystem.Controllers
         //GET
         #region
         [HttpGet("GetAllSubject")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> GetAllSubject(string? searchString, int page = 1)
         {
             try
@@ -37,6 +38,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpGet("GetSubjectById/{id}")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> GetSubjectById(String id)
         {
             try
@@ -52,8 +54,8 @@ namespace LearningManagementSystem.Controllers
                 });
             }
         }
-        [HttpGet("GetSubjectByTeacherId")]
-        [Authorize]
+        [HttpGet("GetSubjectByTeacher")]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> GetSubjectByUserId(string? searchString, string? sortBy, int page = 1)
         {
             try
@@ -73,6 +75,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("CreateSubject")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> CreateSubject([FromBody] SubjectModelCreate model)
         {
             try
@@ -92,6 +95,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("UpdateSubject/{id}")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> UpdateSubject(string id, [FromBody] SubjectModelUpdate model)
         {
             try
@@ -108,7 +112,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPut("UpdateLastRecentBySubjectId/{id}")]
-        [Authorize]
+        [Authorize(Policy = "RequireTeacher")]
         public async Task<IActionResult> UpdateLastRecentBySubjectId(string id)
         {
             try

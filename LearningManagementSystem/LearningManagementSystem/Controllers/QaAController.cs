@@ -78,6 +78,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("QaALike/{QaAId}")]
+        [Authorize]
         public async Task<IActionResult> QaALike(int QaAId)
         {
             try

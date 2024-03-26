@@ -2,6 +2,7 @@
 using LearningManagementSystem.Models.UserBelongToFacultyModel;
 using LearningManagementSystem.Models.UserRoleModels;
 using LearningManagementSystem.Repository.InterfaceRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("CreatorUserBelongToFaculty")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> CreatorUserBelongToFaculty([FromBody] UserBelongToFacultyModelCreate model)
         {
             try
@@ -42,6 +44,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("SetHeadOfDepartment/{userId}/faculty/{facultyId}")]
+        [Authorize (Policy = "RequireAdministrator")]
         public async Task<IActionResult> SetHeadOfDepartment(string userId, string facultyId)
         {
             try

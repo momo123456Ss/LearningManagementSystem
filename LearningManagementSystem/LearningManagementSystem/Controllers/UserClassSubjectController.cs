@@ -20,7 +20,7 @@ namespace LearningManagementSystem.Controllers
         //GET
         #region
         [HttpGet("GetSubjectStudent-AcademicYear/{academicYear}/Semester/{semester}")]
-        [Authorize]
+        [Authorize(Policy = "RequireStudent")]
         public async Task<IActionResult> GetSubjectStudent(string academicYear, string semester, string? searchString, string? sortBy, bool? mark, int page = 1)
         {
             try
@@ -40,6 +40,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("CreatorUserClassSubject")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> CreatorUserClassSubject([FromBody] UserClassSubjectModelCreate model)
         {
             try
@@ -59,7 +60,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("UpdateLastRecentBySubjectId/{subjetcId}/And/{classId}")]
-        [Authorize]
+        [Authorize(Policy = "RequireStudent")]
         public async Task<IActionResult> UpdateLastRecent(string subjetcId, string classId)
         {
             try
@@ -76,7 +77,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpPut("UpdateMarkBySubjectId/{subjetcId}/And/{classId}")]
-        [Authorize]
+        [Authorize(Policy = "RequireStudent")]
         public async Task<IActionResult> UpdateMark(string subjetcId, string classId)
         {
             try

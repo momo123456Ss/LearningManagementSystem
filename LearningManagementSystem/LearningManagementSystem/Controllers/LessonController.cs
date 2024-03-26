@@ -2,6 +2,7 @@
 using LearningManagementSystem.Models.LessonModel;
 using LearningManagementSystem.Models.LessonResources;
 using LearningManagementSystem.Repository.InterfaceRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace LearningManagementSystem.Controllers
             this._interfaceLessonRepository = interfaceLessonRepository;
         }
         [HttpPost("CreateLesson")]
+        [Authorize(Policy = "RequireAdministratorAndTeacher")]
         public async Task<IActionResult> CreateLesson([FromBody] LessonModelCreate model)
         {
             try

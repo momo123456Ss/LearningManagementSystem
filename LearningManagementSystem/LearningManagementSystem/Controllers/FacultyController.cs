@@ -21,6 +21,7 @@ namespace LearningManagementSystem.Controllers
         //GET
         #region
         [HttpGet("GetAllFaculty")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> GetAllFaculty(string? searchString, string? sortBy, int page = 1)
         {
             try
@@ -38,6 +39,7 @@ namespace LearningManagementSystem.Controllers
             }
         }
         [HttpGet("GetFacultyById/{id}")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> GetFacultyById(String id)
         {
             try
@@ -57,6 +59,7 @@ namespace LearningManagementSystem.Controllers
         //POST
         #region
         [HttpPost("CreateFaculty")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> CreateFaculty([FromBody] FacultyModelCreate model)
         {
             try
@@ -76,6 +79,7 @@ namespace LearningManagementSystem.Controllers
         //PUT
         #region
         [HttpPut("UpdateFaculty/{id}")]
+        [Authorize(Policy = "RequireAdministrator")]
         public async Task<IActionResult> UpdateFaculty(string id, [FromBody] FacultyModelUpdate model)
         {
             try
